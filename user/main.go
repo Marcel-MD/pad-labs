@@ -67,13 +67,13 @@ func main() {
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, syscall.SIGSEGV)
 	<-quit
-	log.Warn().Msg("Shutting down server...")
+	log.Warn().Msg("Shutting down HTTP server...")
 
 	// Shutdown HTTP server
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	if err := httpSrv.Shutdown(ctx); err != nil {
-		log.Fatal().Err(err).Msg("Server forced to shutdown")
+		log.Fatal().Err(err).Msg("HTTP Server forced to shutdown")
 	}
 
 	// Shutdown GRPC server
@@ -83,6 +83,4 @@ func main() {
 	if err := data.CloseDB(db); err != nil {
 		log.Fatal().Err(err).Msg("Failed to close db connection")
 	}
-
-	log.Info().Msg("Server exited properly")
 }

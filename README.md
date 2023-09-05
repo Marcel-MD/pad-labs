@@ -13,3 +13,7 @@ $ docker compose up
 ```
 
 You might have to run this command twice if it doesn't work the first time :)
+
+## System Architecture Diagram
+
+![Diagram](https://github.com/Marcel-MD/pad-labs/blob/main/diagram.png)
