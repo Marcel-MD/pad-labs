@@ -1,0 +1,71 @@
+services:
+  # rabbitmq:
+  #   image: rabbitmq:3-management-alpine
+  #   ports:
+  #     - 5672:5672
+  #     - 15672:15672
+  #   volumes:
+  #     - rabbitmq-data:/var/lib/rabbitmq
+  #     - rabbitmq-log:/var/log/rabbitmq
+
+  user-db:
+    image: postgres:latest
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: user-db
+    ports:
+      - "5432:5432"
+    volumes:
+      - user-db:/data/postgres
+
+  user:
+    build:
+      context: ./user
+      dockerfile: Dockerfile
+    depends_on:
+      - user-db
+    ports:
+      - "8080:8080"
+
+  # product-db:
+  #   image: postgres:latest
+  #   environment:
+  #     POSTGRES_PASSWORD: password
+  #     POSTGRES_DB: product-db
+  #   ports:
+  #     - "5433:5432"
+  #   volumes:
+  #     - product-db:/data/postgres
+
+  # product:
+  #   build:
+  #     context: ./product
+  #     dockerfile: Dockerfile
+  #   depends_on:
+  #     - product-db
+  #   ports:
+  #     - "8081:8081"
+
+  # redis:
+  #   image: bitnami/redis:latest
+  #   environment:
+  #     - REDIS_PASSWORD=password
+  #   ports:
+  #     - "6379:6379"
+
+  # gateway:
+  #   build:
+  #     context: ./gateway
+  #     dockerfile: Dockerfile
+  #   depends_on:
+  #     - redis
+  #     - user
+  #     - product
+  #   ports:
+  #     - "3000:3000"
+
+volumes:
+  # rabbitmq-data:
+  # rabbitmq-log:
+  user-db:
+  # product-db:
