@@ -15,8 +15,8 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-func NewServer(cfg config.Config, userController controllers.UserController) *http.Server {
-	log.Info().Msg("Creating new server")
+func NewHttpServer(cfg config.Config, userController controllers.UserController) *http.Server {
+	log.Info().Msg("Creating new HTTP server")
 
 	e := gin.Default()
 	e.Use(middleware.CORS(cfg.AllowOrigin))
@@ -28,7 +28,7 @@ func NewServer(cfg config.Config, userController controllers.UserController) *ht
 	registerUserRoutes(r, cfg, userController)
 
 	return &http.Server{
-		Addr:    ":" + cfg.Port,
+		Addr:    cfg.HttpPort,
 		Handler: e,
 	}
 }

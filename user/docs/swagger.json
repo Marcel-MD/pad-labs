@@ -5,8 +5,8 @@
     ],
     "swagger": "2.0",
     "info": {
-        "description": "This is a sample server for a clean API.",
-        "title": "Clean API",
+        "description": "This is user server.",
+        "title": "User API",
         "contact": {}
     },
     "basePath": "/api",

@@ -19,8 +19,8 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// @title Clean API
-// @description This is a sample server for a clean API.
+// @title User API
+// @description This is user server.
 // @BasePath /api
 // @schemes http https
 // @securityDefinitions.apikey ApiKeyAuth
@@ -43,28 +43,43 @@ func main() {
 	userService := services.NewUserService(userRepository, cfg)
 	userController := controllers.NewUserController(userService)
 
-	srv := api.NewServer(cfg, userController)
-
+	// Start HTTP Server
+	httpSrv := api.NewHttpServer(cfg, userController)
 	go func() {
-		if err := srv.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
-			log.Fatal().Err(err).Msg("Failed to start server")
+		if err := httpSrv.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
+			log.Fatal().Err(err).Msg("Failed to start HTTP server")
 		}
-		log.Info().Msg("All server connections are closed")
+		log.Info().Msg("All HTTP server connections are closed")
 	}()
 
+	// Start GRPC Server
+	grpcSrv, listener, err := api.NewGrpcServer(cfg, userService)
+	if err != nil {
+		log.Fatal().Err(err).Msg("Failed to create gRPC server")
+	}
+	go func() {
+		if err := grpcSrv.Serve(listener); err != nil {
+			log.Fatal().Err(err).Msg("Failed to start gRPC server")
+		}
+	}()
+
+	// Graceful shutdown
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, syscall.SIGSEGV)
-
 	<-quit
 	log.Warn().Msg("Shutting down server...")
 
+	// Shutdown HTTP server
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-
-	if err := srv.Shutdown(ctx); err != nil {
+	if err := httpSrv.Shutdown(ctx); err != nil {
 		log.Fatal().Err(err).Msg("Server forced to shutdown")
 	}
 
+	// Shutdown GRPC server
+	grpcSrv.GracefulStop()
+
+	// Close DB connection
 	if err := data.CloseDB(db); err != nil {
 		log.Fatal().Err(err).Msg("Failed to close db connection")
 	}
