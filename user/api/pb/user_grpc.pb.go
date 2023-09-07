@@ -23,10 +23,11 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserServiceClient interface {
-	GetById(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*User, error)
 	Register(ctx context.Context, in *RegisterUser, opts ...grpc.CallOption) (*Token, error)
 	Login(ctx context.Context, in *LoginUser, opts ...grpc.CallOption) (*Token, error)
+	Validate(ctx context.Context, in *Token, opts ...grpc.CallOption) (*User, error)
 	GetAll(ctx context.Context, in *UsersQuery, opts ...grpc.CallOption) (*Users, error)
+	GetById(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*User, error)
 	Delete(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
@@ -36,15 +37,6 @@ type userServiceClient struct {
 
 func NewUserServiceClient(cc grpc.ClientConnInterface) UserServiceClient {
 	return &userServiceClient{cc}
-}
-
-func (c *userServiceClient) GetById(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*User, error) {
-	out := new(User)
-	err := c.cc.Invoke(ctx, "/UserService/GetById", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
 }
 
 func (c *userServiceClient) Register(ctx context.Context, in *RegisterUser, opts ...grpc.CallOption) (*Token, error) {
@@ -65,9 +57,27 @@ func (c *userServiceClient) Login(ctx context.Context, in *LoginUser, opts ...gr
 	return out, nil
 }
 
+func (c *userServiceClient) Validate(ctx context.Context, in *Token, opts ...grpc.CallOption) (*User, error) {
+	out := new(User)
+	err := c.cc.Invoke(ctx, "/UserService/Validate", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *userServiceClient) GetAll(ctx context.Context, in *UsersQuery, opts ...grpc.CallOption) (*Users, error) {
 	out := new(Users)
 	err := c.cc.Invoke(ctx, "/UserService/GetAll", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) GetById(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*User, error) {
+	out := new(User)
+	err := c.cc.Invoke(ctx, "/UserService/GetById", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -87,10 +97,11 @@ func (c *userServiceClient) Delete(ctx context.Context, in *UserId, opts ...grpc
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility
 type UserServiceServer interface {
-	GetById(context.Context, *UserId) (*User, error)
 	Register(context.Context, *RegisterUser) (*Token, error)
 	Login(context.Context, *LoginUser) (*Token, error)
+	Validate(context.Context, *Token) (*User, error)
 	GetAll(context.Context, *UsersQuery) (*Users, error)
+	GetById(context.Context, *UserId) (*User, error)
 	Delete(context.Context, *UserId) (*emptypb.Empty, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
@@ -99,17 +110,20 @@ type UserServiceServer interface {
 type UnimplementedUserServiceServer struct {
 }
 
-func (UnimplementedUserServiceServer) GetById(context.Context, *UserId) (*User, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetById not implemented")
-}
 func (UnimplementedUserServiceServer) Register(context.Context, *RegisterUser) (*Token, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Register not implemented")
 }
 func (UnimplementedUserServiceServer) Login(context.Context, *LoginUser) (*Token, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
 }
+func (UnimplementedUserServiceServer) Validate(context.Context, *Token) (*User, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Validate not implemented")
+}
 func (UnimplementedUserServiceServer) GetAll(context.Context, *UsersQuery) (*Users, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAll not implemented")
+}
+func (UnimplementedUserServiceServer) GetById(context.Context, *UserId) (*User, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetById not implemented")
 }
 func (UnimplementedUserServiceServer) Delete(context.Context, *UserId) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
@@ -125,24 +139,6 @@ type UnsafeUserServiceServer interface {
 
 func RegisterUserServiceServer(s grpc.ServiceRegistrar, srv UserServiceServer) {
 	s.RegisterService(&UserService_ServiceDesc, srv)
-}
-
-func _UserService_GetById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UserId)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UserServiceServer).GetById(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/UserService/GetById",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).GetById(ctx, req.(*UserId))
-	}
-	return interceptor(ctx, in, info, handler)
 }
 
 func _UserService_Register_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -181,6 +177,24 @@ func _UserService_Login_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_Validate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Token)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).Validate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/UserService/Validate",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).Validate(ctx, req.(*Token))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _UserService_GetAll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UsersQuery)
 	if err := dec(in); err != nil {
@@ -195,6 +209,24 @@ func _UserService_GetAll_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).GetAll(ctx, req.(*UsersQuery))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_GetById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserId)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/UserService/GetById",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetById(ctx, req.(*UserId))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -225,10 +257,6 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*UserServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GetById",
-			Handler:    _UserService_GetById_Handler,
-		},
-		{
 			MethodName: "Register",
 			Handler:    _UserService_Register_Handler,
 		},
@@ -237,8 +265,16 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _UserService_Login_Handler,
 		},
 		{
+			MethodName: "Validate",
+			Handler:    _UserService_Validate_Handler,
+		},
+		{
 			MethodName: "GetAll",
 			Handler:    _UserService_GetAll_Handler,
+		},
+		{
+			MethodName: "GetById",
+			Handler:    _UserService_GetById_Handler,
 		},
 		{
 			MethodName: "Delete",

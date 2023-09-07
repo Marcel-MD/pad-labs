@@ -37,16 +37,6 @@ type grpcServer struct {
 	userService services.UserService
 }
 
-func (s *grpcServer) GetById(ctx context.Context, pbUserId *pb.UserId) (*pb.User, error) {
-	user, err := s.userService.FindById(pbUserId.Id)
-	if err != nil {
-		return nil, err
-	}
-	pbUser := mapUser(user)
-
-	return pbUser, nil
-}
-
 func mapUser(user models.User) *pb.User {
 	return &pb.User{
 		Id:        user.ID,
@@ -70,7 +60,6 @@ func (s *grpcServer) Register(ctx context.Context, pbRegisterUser *pb.RegisterUs
 	}
 
 	pbToken := pb.Token{
-		User:  mapUser(token.User),
 		Token: token.Token,
 	}
 
@@ -89,11 +78,20 @@ func (s *grpcServer) Login(ctx context.Context, pbLoginUser *pb.LoginUser) (*pb.
 	}
 
 	pbToken := pb.Token{
-		User:  mapUser(token.User),
 		Token: token.Token,
 	}
 
 	return &pbToken, nil
+}
+
+func (s *grpcServer) Validate(ctx context.Context, pbToken *pb.Token) (*pb.User, error) {
+	user, err := s.userService.Validate(pbToken.Token)
+	if err != nil {
+		return nil, err
+	}
+	pbUser := mapUser(user)
+
+	return pbUser, nil
 }
 
 func (s *grpcServer) GetAll(ctx context.Context, pbUsersQuery *pb.UsersQuery) (*pb.Users, error) {
@@ -113,6 +111,16 @@ func (s *grpcServer) GetAll(ctx context.Context, pbUsersQuery *pb.UsersQuery) (*
 	}
 
 	return &pb.Users{Users: pbUsers}, nil
+}
+
+func (s *grpcServer) GetById(ctx context.Context, pbUserId *pb.UserId) (*pb.User, error) {
+	user, err := s.userService.FindById(pbUserId.Id)
+	if err != nil {
+		return nil, err
+	}
+	pbUser := mapUser(user)
+
+	return pbUser, nil
 }
 
 func (s *grpcServer) Delete(ctx context.Context, pbUserId *pb.UserId) (*emptypb.Empty, error) {

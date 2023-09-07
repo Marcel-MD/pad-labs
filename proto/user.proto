@@ -6,10 +6,12 @@ import "google/protobuf/empty.proto";
 option go_package="./pb";
 
 service UserService {
-    rpc GetById(UserId) returns (User);
     rpc Register (RegisterUser) returns (Token);
     rpc Login (LoginUser) returns (Token);
+    rpc Validate (Token) returns (User);
+
     rpc GetAll (UsersQuery) returns (Users);
+    rpc GetById (UserId) returns (User);
     rpc Delete (UserId) returns (google.protobuf.Empty);
 }
 
@@ -43,7 +45,6 @@ message UserId {
 }
 
 message Token {
-    User user = 1;
     string token = 2;
 }
 

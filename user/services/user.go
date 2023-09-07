@@ -15,12 +15,13 @@ import (
 )
 
 type UserService interface {
-	FindAll(query models.PaginationQuery) ([]models.User, error)
-	FindById(id string) (models.User, error)
 	Register(user models.RegisterUser) (models.Token, error)
 	Login(user models.LoginUser) (models.Token, error)
-
+	Validate(token string) (models.User, error)
+	FindAll(query models.PaginationQuery) ([]models.User, error)
+	FindById(id string) (models.User, error)
 	Delete(id string) error
+
 	AssignRole(id, role string) error
 	RemoveRole(id, role string) error
 }
@@ -37,14 +38,6 @@ func NewUserService(repository repositories.UserRepository, cfg config.Config) U
 type userService struct {
 	repository repositories.UserRepository
 	cfg        config.Config
-}
-
-func (s *userService) FindAll(query models.PaginationQuery) ([]models.User, error) {
-	return s.repository.FindAll(query)
-}
-
-func (s *userService) FindById(id string) (models.User, error) {
-	return s.repository.FindById(id)
 }
 
 func (s *userService) Register(user models.RegisterUser) (models.Token, error) {
@@ -109,6 +102,35 @@ func (s *userService) Login(user models.LoginUser) (models.Token, error) {
 	token.User = existingUser
 
 	return token, nil
+}
+
+func (s *userService) Validate(token string) (models.User, error) {
+	var user models.User
+
+	jwt, err := auth.Validate(token, s.cfg.AccessTokenSecret)
+	if err != nil {
+		return user, err
+	}
+
+	id, err := auth.ExtractId(jwt)
+	if err != nil {
+		return user, err
+	}
+
+	user, err = s.repository.FindById(id)
+	if err != nil {
+		return user, err
+	}
+
+	return user, nil
+}
+
+func (s *userService) FindAll(query models.PaginationQuery) ([]models.User, error) {
+	return s.repository.FindAll(query)
+}
+
+func (s *userService) FindById(id string) (models.User, error) {
+	return s.repository.FindById(id)
 }
 
 func (s *userService) Delete(id string) error {

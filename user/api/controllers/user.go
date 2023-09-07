@@ -16,8 +16,8 @@ type UserController interface {
 	GetCurrent(ctx *gin.Context)
 	Register(ctx *gin.Context)
 	Login(ctx *gin.Context)
-
 	Delete(ctx *gin.Context)
+
 	AssignRole(ctx *gin.Context)
 	RemoveRole(ctx *gin.Context)
 }
