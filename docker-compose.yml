@@ -28,24 +28,14 @@ services:
       - "8080:8080"
       - "8081:8081"
 
-  # product-db:
-  #   image: postgres:latest
-  #   environment:
-  #     POSTGRES_PASSWORD: password
-  #     POSTGRES_DB: product-db
-  #   ports:
-  #     - "5433:5432"
-  #   volumes:
-  #     - product-db:/data/postgres
-
-  # product:
-  #   build:
-  #     context: ./product
-  #     dockerfile: Dockerfile
-  #   depends_on:
-  #     - product-db
-  #   ports:
-  #     - "9090:9090"
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    depends_on:
+      - user
+    ports:
+      - "3000:3000"
 
   # redis:
   #   image: bitnami/redis:latest
@@ -54,19 +44,7 @@ services:
   #   ports:
   #     - "6379:6379"
 
-  # gateway:
-  #   build:
-  #     context: ./gateway
-  #     dockerfile: Dockerfile
-  #   depends_on:
-  #     - redis
-  #     - user
-  #     - product
-  #   ports:
-  #     - "3000:3000"
-
 volumes:
   # rabbitmq-data:
   # rabbitmq-log:
   user-db:
-  # product-db:

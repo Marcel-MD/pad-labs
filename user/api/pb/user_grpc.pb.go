@@ -41,7 +41,7 @@ func NewUserServiceClient(cc grpc.ClientConnInterface) UserServiceClient {
 
 func (c *userServiceClient) Register(ctx context.Context, in *RegisterUser, opts ...grpc.CallOption) (*Token, error) {
 	out := new(Token)
-	err := c.cc.Invoke(ctx, "/UserService/Register", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/user.UserService/Register", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +50,7 @@ func (c *userServiceClient) Register(ctx context.Context, in *RegisterUser, opts
 
 func (c *userServiceClient) Login(ctx context.Context, in *LoginUser, opts ...grpc.CallOption) (*Token, error) {
 	out := new(Token)
-	err := c.cc.Invoke(ctx, "/UserService/Login", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/user.UserService/Login", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +59,7 @@ func (c *userServiceClient) Login(ctx context.Context, in *LoginUser, opts ...gr
 
 func (c *userServiceClient) Validate(ctx context.Context, in *Token, opts ...grpc.CallOption) (*User, error) {
 	out := new(User)
-	err := c.cc.Invoke(ctx, "/UserService/Validate", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/user.UserService/Validate", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +68,7 @@ func (c *userServiceClient) Validate(ctx context.Context, in *Token, opts ...grp
 
 func (c *userServiceClient) GetAll(ctx context.Context, in *UsersQuery, opts ...grpc.CallOption) (*Users, error) {
 	out := new(Users)
-	err := c.cc.Invoke(ctx, "/UserService/GetAll", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/user.UserService/GetAll", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -77,7 +77,7 @@ func (c *userServiceClient) GetAll(ctx context.Context, in *UsersQuery, opts ...
 
 func (c *userServiceClient) GetById(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*User, error) {
 	out := new(User)
-	err := c.cc.Invoke(ctx, "/UserService/GetById", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/user.UserService/GetById", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +86,7 @@ func (c *userServiceClient) GetById(ctx context.Context, in *UserId, opts ...grp
 
 func (c *userServiceClient) Delete(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/UserService/Delete", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/user.UserService/Delete", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -151,7 +151,7 @@ func _UserService_Register_Handler(srv interface{}, ctx context.Context, dec fun
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/UserService/Register",
+		FullMethod: "/user.UserService/Register",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).Register(ctx, req.(*RegisterUser))
@@ -169,7 +169,7 @@ func _UserService_Login_Handler(srv interface{}, ctx context.Context, dec func(i
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/UserService/Login",
+		FullMethod: "/user.UserService/Login",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).Login(ctx, req.(*LoginUser))
@@ -187,7 +187,7 @@ func _UserService_Validate_Handler(srv interface{}, ctx context.Context, dec fun
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/UserService/Validate",
+		FullMethod: "/user.UserService/Validate",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).Validate(ctx, req.(*Token))
@@ -205,7 +205,7 @@ func _UserService_GetAll_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/UserService/GetAll",
+		FullMethod: "/user.UserService/GetAll",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).GetAll(ctx, req.(*UsersQuery))
@@ -223,7 +223,7 @@ func _UserService_GetById_Handler(srv interface{}, ctx context.Context, dec func
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/UserService/GetById",
+		FullMethod: "/user.UserService/GetById",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).GetById(ctx, req.(*UserId))
@@ -241,7 +241,7 @@ func _UserService_Delete_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/UserService/Delete",
+		FullMethod: "/user.UserService/Delete",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).Delete(ctx, req.(*UserId))
@@ -253,7 +253,7 @@ func _UserService_Delete_Handler(srv interface{}, ctx context.Context, dec func(
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var UserService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "UserService",
+	ServiceName: "user.UserService",
 	HandlerType: (*UserServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
