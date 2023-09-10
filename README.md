@@ -1,7 +1,8 @@
 # Laboratory Works on Distributed Systems Programming
 
 ## Description
-This repository contains the laboratory works on Distributed Systems Programming course.
+
+E-commerce platform that allows users to buy and sell products. This idea's implementation through distributed systems is suitable because it can be easily separated in distinct components that can be developed independently. Similar platforms that use microservices architecture are Amazon, eBay, AliExpress, etc.
 
 ## Run Application with Docker
 

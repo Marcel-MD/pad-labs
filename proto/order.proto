@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+option go_package="./pb";
+
+package order;
+
+service OrderService {
+    rpc GetAll (OrdersQuery) returns (Orders);
+    rpc GetById (OrderId) returns (Order);
+    rpc Create (CreateOrder) returns (OrderId);
+    rpc Update (UpdateOrder) returns (google.protobuf.Empty);
+    rpc Delete (OrderId) returns (google.protobuf.Empty);
+}
+
+message Order {
+    string id = 1;
+    string product_id = 2;
+    string user_id = 3;
+    string product_owner_id = 4;
+
+    int64 quantity = 5;
+    int64 cost = 6;
+    string status = 7;
+    string shipping_address = 8;
+
+    google.protobuf.Timestamp created_at = 9;
+    google.protobuf.Timestamp updated_at = 10;
+}
+
+message Orders {
+    repeated Order orders = 1;
+}
+
+message CreateOrder {
+    string product_id = 1;
+    string user_id = 2;
+    string product_owner_id = 3;
+    int64 quantity = 4;
+    int64 cost = 5;
+    string status = 6;
+    string shipping_address = 7;
+}
+
+message UpdateOrder {
+    string id = 1;
+    string status = 2;
+}
+
+message OrderId {
+    string id = 1;
+}
+
+message OrdersQuery {
+    int64 page = 1;
+    int64 size = 2;
+    string user_id = 3;
+    string product_owner_id = 4;
+}

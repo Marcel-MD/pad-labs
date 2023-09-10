@@ -7,7 +7,6 @@ export class UserDto {
     email: string;
     createdAt: Timestamp | undefined;
     updatedAt: Timestamp | undefined;
-    deletedAt: Timestamp | undefined;
 }
 
 export class UsersDto {

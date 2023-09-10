@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+option go_package="./pb";
+
+package product;
+
+service ProductService {
+    rpc GetAll (ProductsQuery) returns (Products);
+    rpc GetById (ProductId) returns (Product);
+    rpc Create (CreateProduct) returns (ProductId);
+    rpc Update (UpdateProduct) returns (google.protobuf.Empty);
+    rpc Delete (ProductId) returns (google.protobuf.Empty);
+}
+
+message Product {
+    string id = 1;
+    string owner_id = 2;
+    
+    string name = 3;
+    int64 price = 4;
+    int64 stock = 5;
+    
+    google.protobuf.Timestamp created_at = 6;
+    google.protobuf.Timestamp updated_at = 7;
+}
+
+message Products {
+    repeated Product products = 1;
+}
+
+message CreateProduct {
+    string owner_id = 1;
+    string name = 2;
+    int64 price = 3;
+    int64 stock = 4;
+}
+
+message UpdateProduct {
+    string id = 1;
+    string name = 2;
+    int64 price = 3;
+    int64 stock = 4;
+}
+
+message ProductId {
+    string id = 1;
+}
+
+message ProductsQuery {
+    int64 page = 1;
+    int64 size = 2;
+    string owner_id = 3;
+}

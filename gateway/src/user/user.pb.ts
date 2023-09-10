@@ -12,7 +12,6 @@ export interface User {
   email: string;
   createdAt: Timestamp | undefined;
   updatedAt: Timestamp | undefined;
-  deletedAt: Timestamp | undefined;
 }
 
 export interface Users {

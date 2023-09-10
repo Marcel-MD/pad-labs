@@ -24,7 +24,6 @@ message User {
 
     google.protobuf.Timestamp created_at = 4;
     google.protobuf.Timestamp updated_at = 5;
-    google.protobuf.Timestamp deleted_at = 6;
 }
 
 message Users {
@@ -47,7 +46,7 @@ message UserId {
 }
 
 message Token {
-    string token = 2;
+    string token = 1;
 }
 
 message UsersQuery {
