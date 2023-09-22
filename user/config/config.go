@@ -14,6 +14,7 @@ type Config struct {
 	GrpcPort    string `env:"GRPC_PORT" envDefault:":8081"`
 	AllowOrigin string `env:"ALLOW_ORIGIN" envDefault:"*"`
 	Env         string `env:"ENV" envDefault:"dev"`
+	RabbitMQUrl string `env:"RABBIT_MQ_URL" envDefault:"amqp://guest:guest@rabbitmq:5672/"`
 
 	AccessTokenSecret   string        `env:"ACCESS_TOKEN_SECRET" envDefault:"SecretAccessSecretAccess"`
 	AccessTokenLifespan time.Duration `env:"ACCESS_TOKEN_LIFESPAN" envDefault:"72h"`

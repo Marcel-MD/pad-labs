@@ -11,6 +11,7 @@ import (
 
 	"user/api"
 	"user/api/controllers"
+	"user/api/mq"
 	"user/config"
 	"user/data"
 	"user/data/repositories"
@@ -33,15 +34,22 @@ func main() {
 		log.Fatal().Err(err).Msg("Failed to load config")
 	}
 
+	// DB
 	db, err := data.NewDB(cfg)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to connect to database")
 	}
 
+	// RabbitMQ
+	producer, err := mq.NewProducer(cfg)
+	if err != nil {
+		log.Fatal().Err(err).Msg("Failed to create RabbitMQ producer")
+	}
+
 	// User
 	userRepository := repositories.NewUserRepository(db)
 	userService := services.NewUserService(userRepository, cfg)
-	userController := controllers.NewUserController(userService)
+	userController := controllers.NewUserController(userService, producer)
 
 	// Start HTTP Server
 	httpSrv := api.NewHttpServer(cfg, userController)
@@ -53,7 +61,7 @@ func main() {
 	}()
 
 	// Start GRPC Server
-	grpcSrv, listener, err := api.NewGrpcServer(cfg, userService)
+	grpcSrv, listener, err := api.NewGrpcServer(cfg, userService, producer)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to create gRPC server")
 	}
@@ -78,6 +86,11 @@ func main() {
 
 	// Shutdown GRPC server
 	grpcSrv.GracefulStop()
+
+	// Close RabbitMQ connection
+	if err := producer.Close(); err != nil {
+		log.Fatal().Err(err).Msg("Failed to close RabbitMQ connection")
+	}
 
 	// Close DB connection
 	if err := data.CloseDB(db); err != nil {

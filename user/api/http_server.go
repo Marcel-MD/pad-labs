@@ -7,7 +7,6 @@ import (
 	"user/api/middleware"
 	"user/config"
 	docs "user/docs"
-	"user/models"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
@@ -51,9 +50,4 @@ func registerUserRoutes(router *gin.RouterGroup, cfg config.Config, c controller
 
 	pr := r.Use(middleware.JwtAuth(cfg.AccessTokenSecret))
 	pr.GET("/current", c.GetCurrent)
-
-	ar := r.Use(middleware.JwtAuthRoles(cfg.AccessTokenSecret, []string{models.AdminRole}))
-	ar.DELETE("/:id", c.Delete)
-	ar.PATCH("/:id/roles/:role", c.AssignRole)
-	ar.DELETE("/:id/roles/:role", c.RemoveRole)
 }

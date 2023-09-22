@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"net"
+	"user/api/mq"
 	"user/api/pb"
 	"user/config"
 	"user/models"
@@ -10,15 +11,15 @@ import (
 
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
-	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func NewGrpcServer(cfg config.Config, userService services.UserService) (*grpc.Server, net.Listener, error) {
+func NewGrpcServer(cfg config.Config, userService services.UserService, producer mq.Producer) (*grpc.Server, net.Listener, error) {
 	log.Info().Msg("Creating new GRPC server")
 
 	server := &grpcServer{
 		userService: userService,
+		producer:    producer,
 	}
 
 	listener, err := net.Listen("tcp", cfg.GrpcPort)
@@ -35,6 +36,7 @@ func NewGrpcServer(cfg config.Config, userService services.UserService) (*grpc.S
 type grpcServer struct {
 	pb.UnsafeUserServiceServer
 	userService services.UserService
+	producer    mq.Producer
 }
 
 func mapUser(user models.User) *pb.User {
@@ -58,6 +60,8 @@ func (s *grpcServer) Register(ctx context.Context, pbRegisterUser *pb.RegisterUs
 	if err != nil {
 		return nil, err
 	}
+
+	s.producer.SendMsg(models.CreateUserMsgType, token.User, []string{models.ProductQueue, models.OrderQueue})
 
 	pbToken := pb.Token{
 		Token: token.Token,
@@ -121,13 +125,4 @@ func (s *grpcServer) GetById(ctx context.Context, pbUserId *pb.UserId) (*pb.User
 	pbUser := mapUser(user)
 
 	return pbUser, nil
-}
-
-func (s *grpcServer) Delete(ctx context.Context, pbUserId *pb.UserId) (*emptypb.Empty, error) {
-	err := s.userService.Delete(pbUserId.Id)
-	if err != nil {
-		return nil, err
-	}
-
-	return &emptypb.Empty{}, nil
 }

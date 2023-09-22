@@ -11,7 +11,6 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -28,7 +27,6 @@ type UserServiceClient interface {
 	Validate(ctx context.Context, in *Token, opts ...grpc.CallOption) (*User, error)
 	GetAll(ctx context.Context, in *UsersQuery, opts ...grpc.CallOption) (*Users, error)
 	GetById(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*User, error)
-	Delete(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type userServiceClient struct {
@@ -84,15 +82,6 @@ func (c *userServiceClient) GetById(ctx context.Context, in *UserId, opts ...grp
 	return out, nil
 }
 
-func (c *userServiceClient) Delete(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/user.UserService/Delete", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility
@@ -102,7 +91,6 @@ type UserServiceServer interface {
 	Validate(context.Context, *Token) (*User, error)
 	GetAll(context.Context, *UsersQuery) (*Users, error)
 	GetById(context.Context, *UserId) (*User, error)
-	Delete(context.Context, *UserId) (*emptypb.Empty, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -124,9 +112,6 @@ func (UnimplementedUserServiceServer) GetAll(context.Context, *UsersQuery) (*Use
 }
 func (UnimplementedUserServiceServer) GetById(context.Context, *UserId) (*User, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetById not implemented")
-}
-func (UnimplementedUserServiceServer) Delete(context.Context, *UserId) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 
@@ -231,24 +216,6 @@ func _UserService_GetById_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserService_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UserId)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UserServiceServer).Delete(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/user.UserService/Delete",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).Delete(ctx, req.(*UserId))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -275,10 +242,6 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetById",
 			Handler:    _UserService_GetById_Handler,
-		},
-		{
-			MethodName: "Delete",
-			Handler:    _UserService_Delete_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
