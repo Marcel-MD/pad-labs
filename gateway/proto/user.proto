@@ -1,7 +1,6 @@
 syntax = "proto3";
 
 import "google/protobuf/timestamp.proto";
-import "google/protobuf/empty.proto";
 
 option go_package="./pb";
 
@@ -14,7 +13,6 @@ service UserService {
 
     rpc GetAll (UsersQuery) returns (Users);
     rpc GetById (UserId) returns (User);
-    rpc Delete (UserId) returns (google.protobuf.Empty);
 }
 
 message User {

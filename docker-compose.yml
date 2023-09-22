@@ -1,12 +1,12 @@
 services:
-  # rabbitmq:
-  #   image: rabbitmq:3-management-alpine
-  #   ports:
-  #     - 5672:5672
-  #     - 15672:15672
-  #   volumes:
-  #     - rabbitmq-data:/var/lib/rabbitmq
-  #     - rabbitmq-log:/var/log/rabbitmq
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+      - rabbitmq-log:/var/log/rabbitmq
 
   user-db:
     image: postgres:latest
@@ -45,6 +45,6 @@ services:
   #     - "6379:6379"
 
 volumes:
-  # rabbitmq-data:
-  # rabbitmq-log:
+  rabbitmq-data:
+  rabbitmq-log:
   user-db:

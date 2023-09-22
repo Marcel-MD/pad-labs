@@ -1,7 +1,6 @@
 /* eslint-disable */
 import { GrpcMethod, GrpcStreamMethod } from "@nestjs/microservices";
 import { Observable } from "rxjs";
-import { Empty } from "./google/protobuf/empty.pb";
 import { Timestamp } from "./google/protobuf/timestamp.pb";
 
 export const protobufPackage = "user";
@@ -54,8 +53,6 @@ export interface UserServiceClient {
   getAll(request: UsersQuery): Observable<Users>;
 
   getById(request: UserId): Observable<User>;
-
-  delete(request: UserId): Observable<Empty>;
 }
 
 export interface UserServiceController {
@@ -68,13 +65,11 @@ export interface UserServiceController {
   getAll(request: UsersQuery): Promise<Users> | Observable<Users> | Users;
 
   getById(request: UserId): Promise<User> | Observable<User> | User;
-
-  delete(request: UserId): void;
 }
 
 export function UserServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ["register", "login", "validate", "getAll", "getById", "delete"];
+    const grpcMethods: string[] = ["register", "login", "validate", "getAll", "getById"];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
       GrpcMethod("UserService", method)(constructor.prototype[method], method, descriptor);
