@@ -12,7 +12,7 @@ import { USER_SERVICE_NAME, USER_PACKAGE_NAME } from './user.pb';
         name: USER_SERVICE_NAME,
         transport: Transport.GRPC,
         options: {
-          url: 'user:8081',
+          url: process.env.USER_URL || 'user:8081',
           package: USER_PACKAGE_NAME,
           protoPath: './proto/user.proto',
         },
