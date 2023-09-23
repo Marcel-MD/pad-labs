@@ -1,0 +1,73 @@
+package main
+
+import (
+	"os"
+	"os/signal"
+	"syscall"
+
+	"product/api"
+	"product/api/mq"
+	"product/config"
+	"product/data"
+	"product/data/repositories"
+	"product/services"
+
+	"github.com/rs/zerolog/log"
+)
+
+func main() {
+	cfg, err := config.NewConfig()
+	if err != nil {
+		log.Fatal().Err(err).Msg("Failed to load config")
+	}
+
+	// DB
+	db, err := data.NewDB(cfg)
+	if err != nil {
+		log.Fatal().Err(err).Msg("Failed to connect to database")
+	}
+
+	// RabbitMQ
+	producer, err := mq.NewProducer(cfg)
+	if err != nil {
+		log.Fatal().Err(err).Msg("Failed to create RabbitMQ producer")
+	}
+
+	// User
+	// userRepository := repositories.NewUserRepository(db)
+	// userService := services.NewUserService(userRepository, cfg)
+
+	// Product
+	productRepository := repositories.NewProductRepository(db)
+	productService := services.NewProductService(productRepository, cfg)
+
+	// Start GRPC Server
+	grpcSrv, listener, err := api.NewGrpcServer(cfg, productService, producer)
+	if err != nil {
+		log.Fatal().Err(err).Msg("Failed to create gRPC server")
+	}
+	go func() {
+		if err := grpcSrv.Serve(listener); err != nil {
+			log.Fatal().Err(err).Msg("Failed to start gRPC server")
+		}
+	}()
+
+	// Graceful shutdown
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, syscall.SIGSEGV)
+	<-quit
+	log.Warn().Msg("Shutting down HTTP server...")
+
+	// Shutdown GRPC server
+	grpcSrv.GracefulStop()
+
+	// Close RabbitMQ connection
+	if err := producer.Close(); err != nil {
+		log.Fatal().Err(err).Msg("Failed to close RabbitMQ connection")
+	}
+
+	// Close DB connection
+	if err := data.CloseDB(db); err != nil {
+		log.Fatal().Err(err).Msg("Failed to close db connection")
+	}
+}
