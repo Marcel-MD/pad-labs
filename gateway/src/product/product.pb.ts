@@ -29,9 +29,15 @@ export interface CreateProduct {
 
 export interface UpdateProduct {
   id: string;
+  ownerId: string;
   name: string;
   price: number;
   stock: number;
+}
+
+export interface DeleteProduct {
+  id: string;
+  ownerId: string;
 }
 
 export interface ProductId {
@@ -55,7 +61,7 @@ export interface ProductServiceClient {
 
   update(request: UpdateProduct): Observable<Empty>;
 
-  delete(request: ProductId): Observable<Empty>;
+  delete(request: DeleteProduct): Observable<Empty>;
 }
 
 export interface ProductServiceController {
@@ -67,7 +73,7 @@ export interface ProductServiceController {
 
   update(request: UpdateProduct): void;
 
-  delete(request: ProductId): void;
+  delete(request: DeleteProduct): void;
 }
 
 export function ProductServiceControllerMethods() {

@@ -120,13 +120,13 @@ func (s *grpcServer) Update(ctx context.Context, pbUpdateProduct *pb.UpdateProdu
 	return &emptypb.Empty{}, nil
 }
 
-func (s *grpcServer) Delete(ctx context.Context, pbProductId *pb.ProductId) (*emptypb.Empty, error) {
-	err := s.productService.Delete(pbProductId.Id)
+func (s *grpcServer) Delete(ctx context.Context, pbDeleteProduct *pb.DeleteProduct) (*emptypb.Empty, error) {
+	err := s.productService.Delete(pbDeleteProduct.Id)
 	if err != nil {
 		return nil, err
 	}
 
-	s.producer.SendMsg(models.DeleteProductMsgType, pbProductId.Id, []string{models.OrderQueue})
+	s.producer.SendMsg(models.DeleteProductMsgType, pbDeleteProduct.Id, []string{models.OrderQueue})
 
 	return &emptypb.Empty{}, nil
 }

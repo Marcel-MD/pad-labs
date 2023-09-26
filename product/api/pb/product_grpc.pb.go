@@ -27,7 +27,7 @@ type ProductServiceClient interface {
 	GetById(ctx context.Context, in *ProductId, opts ...grpc.CallOption) (*Product, error)
 	Create(ctx context.Context, in *CreateProduct, opts ...grpc.CallOption) (*ProductId, error)
 	Update(ctx context.Context, in *UpdateProduct, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	Delete(ctx context.Context, in *ProductId, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	Delete(ctx context.Context, in *DeleteProduct, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type productServiceClient struct {
@@ -74,7 +74,7 @@ func (c *productServiceClient) Update(ctx context.Context, in *UpdateProduct, op
 	return out, nil
 }
 
-func (c *productServiceClient) Delete(ctx context.Context, in *ProductId, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *productServiceClient) Delete(ctx context.Context, in *DeleteProduct, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, "/product.ProductService/Delete", in, out, opts...)
 	if err != nil {
@@ -91,7 +91,7 @@ type ProductServiceServer interface {
 	GetById(context.Context, *ProductId) (*Product, error)
 	Create(context.Context, *CreateProduct) (*ProductId, error)
 	Update(context.Context, *UpdateProduct) (*emptypb.Empty, error)
-	Delete(context.Context, *ProductId) (*emptypb.Empty, error)
+	Delete(context.Context, *DeleteProduct) (*emptypb.Empty, error)
 	mustEmbedUnimplementedProductServiceServer()
 }
 
@@ -111,7 +111,7 @@ func (UnimplementedProductServiceServer) Create(context.Context, *CreateProduct)
 func (UnimplementedProductServiceServer) Update(context.Context, *UpdateProduct) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
 }
-func (UnimplementedProductServiceServer) Delete(context.Context, *ProductId) (*emptypb.Empty, error) {
+func (UnimplementedProductServiceServer) Delete(context.Context, *DeleteProduct) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
 }
 func (UnimplementedProductServiceServer) mustEmbedUnimplementedProductServiceServer() {}
@@ -200,7 +200,7 @@ func _ProductService_Update_Handler(srv interface{}, ctx context.Context, dec fu
 }
 
 func _ProductService_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ProductId)
+	in := new(DeleteProduct)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -212,7 +212,7 @@ func _ProductService_Delete_Handler(srv interface{}, ctx context.Context, dec fu
 		FullMethod: "/product.ProductService/Delete",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ProductServiceServer).Delete(ctx, req.(*ProductId))
+		return srv.(ProductServiceServer).Delete(ctx, req.(*DeleteProduct))
 	}
 	return interceptor(ctx, in, info, handler)
 }
