@@ -12,45 +12,62 @@ type ProductService interface {
 	FindAll(query models.PaginationQuery) ([]models.Product, error)
 	FindById(id string) (models.Product, error)
 	Create(product models.Product) (models.Product, error)
+	Update(product models.Product) (models.Product, error)
 	Delete(id string) error
 }
 
-func NewProductService(repository repositories.ProductRepository, cfg config.Config) ProductService {
+func NewProductService(productRepository repositories.ProductRepository, userRepository repositories.UserRepository, cfg config.Config) ProductService {
 	log.Info().Msg("Creating new product service")
 
 	return &productService{
-		repository: repository,
-		cfg:        cfg,
+		productRepository: productRepository,
+		userRepository:    userRepository,
+		cfg:               cfg,
 	}
 }
 
 type productService struct {
-	repository repositories.ProductRepository
-	cfg        config.Config
+	productRepository repositories.ProductRepository
+	userRepository    repositories.UserRepository
+	cfg               config.Config
 }
 
 func (s *productService) FindAll(query models.PaginationQuery) ([]models.Product, error) {
-	return s.repository.FindAll(query)
+	return s.productRepository.FindAll(query)
 }
 
 func (s *productService) FindById(id string) (models.Product, error) {
-	return s.repository.FindById(id)
-}
-
-func (s *productService) Delete(id string) error {
-	product, err := s.repository.FindById(id)
-	if err != nil {
-		return err
-	}
-
-	return s.repository.Delete(&product)
+	return s.productRepository.FindById(id)
 }
 
 func (s *productService) Create(product models.Product) (models.Product, error) {
-	err := s.repository.Create(&product)
+	_, err := s.userRepository.FindById(product.OwnerId)
+	if err != nil {
+		return product, err
+	}
+
+	err = s.productRepository.Create(&product)
 	if err != nil {
 		return product, err
 	}
 
 	return product, nil
+}
+
+func (s *productService) Update(product models.Product) (models.Product, error) {
+	err := s.productRepository.Update(&product)
+	if err != nil {
+		return product, err
+	}
+
+	return product, nil
+}
+
+func (s *productService) Delete(id string) error {
+	product, err := s.productRepository.FindById(id)
+	if err != nil {
+		return err
+	}
+
+	return s.productRepository.Delete(&product)
 }

@@ -12,7 +12,6 @@ service OrderService {
     rpc GetById (OrderId) returns (Order);
     rpc Create (CreateOrder) returns (OrderId);
     rpc Update (UpdateOrder) returns (google.protobuf.Empty);
-    rpc Delete (OrderId) returns (google.protobuf.Empty);
 }
 
 message Order {

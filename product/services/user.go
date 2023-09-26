@@ -37,15 +37,6 @@ func (s *userService) FindById(id string) (models.User, error) {
 	return s.repository.FindById(id)
 }
 
-func (s *userService) Delete(id string) error {
-	user, err := s.repository.FindById(id)
-	if err != nil {
-		return err
-	}
-
-	return s.repository.Delete(&user)
-}
-
 func (s *userService) Create(user models.User) (models.User, error) {
 	err := s.repository.Create(&user)
 	if err != nil {
@@ -53,4 +44,13 @@ func (s *userService) Create(user models.User) (models.User, error) {
 	}
 
 	return user, nil
+}
+
+func (s *userService) Delete(id string) error {
+	user, err := s.repository.FindById(id)
+	if err != nil {
+		return err
+	}
+
+	return s.repository.Delete(&user)
 }

@@ -44,6 +44,7 @@ func mapUser(user models.User) *pb.User {
 		Id:        user.ID,
 		Email:     user.Email,
 		Name:      user.Name,
+		Roles:     user.Roles,
 		CreatedAt: timestamppb.New(user.CreatedAt),
 		UpdatedAt: timestamppb.New(user.UpdatedAt),
 	}
@@ -61,7 +62,7 @@ func (s *grpcServer) Register(ctx context.Context, pbRegisterUser *pb.RegisterUs
 		return nil, err
 	}
 
-	s.producer.SendMsg(models.CreateUserMsgType, token.User, []string{models.ProductQueue, models.OrderQueue})
+	s.producer.SendMsg(models.CreateUserMsgType, token.User.Base, []string{models.ProductQueue, models.OrderQueue})
 
 	pbToken := pb.Token{
 		Token: token.Token,

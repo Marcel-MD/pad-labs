@@ -2,7 +2,13 @@ package models
 
 const (
 	CreateUserMsgType = "CreateUser"
-	DeleteUserMsgType = "DeleteUser"
+
+	CreateProductMsgType = "CreateProduct"
+	UpdateProductMsgType = "UpdateProduct"
+	DeleteProductMsgType = "DeleteProduct"
+
+	CreateOrderMsgType = "CreateOrder"
+	UpdateOrderMsgType = "UpdateOrder"
 )
 
 const (

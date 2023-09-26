@@ -27,19 +27,25 @@ func main() {
 		log.Fatal().Err(err).Msg("Failed to connect to database")
 	}
 
-	// RabbitMQ
+	// RabbitMQ Producer
 	producer, err := mq.NewProducer(cfg)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to create RabbitMQ producer")
 	}
 
 	// User
-	// userRepository := repositories.NewUserRepository(db)
-	// userService := services.NewUserService(userRepository, cfg)
+	userRepository := repositories.NewUserRepository(db)
+	userService := services.NewUserService(userRepository, cfg)
 
 	// Product
 	productRepository := repositories.NewProductRepository(db)
-	productService := services.NewProductService(productRepository, cfg)
+	productService := services.NewProductService(productRepository, userRepository, cfg)
+
+	// RabbitMQ Consumer
+	consumer, err := mq.NewConsumer(cfg, userService, productService)
+	if err != nil {
+		log.Fatal().Err(err).Msg("Failed to create RabbitMQ consumer")
+	}
 
 	// Start GRPC Server
 	grpcSrv, listener, err := api.NewGrpcServer(cfg, productService, producer)
@@ -56,13 +62,18 @@ func main() {
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, syscall.SIGSEGV)
 	<-quit
-	log.Warn().Msg("Shutting down HTTP server...")
+	log.Warn().Msg("Shutting down product server...")
 
 	// Shutdown GRPC server
 	grpcSrv.GracefulStop()
 
-	// Close RabbitMQ connection
+	// Close RabbitMQ producer
 	if err := producer.Close(); err != nil {
+		log.Fatal().Err(err).Msg("Failed to close RabbitMQ connection")
+	}
+
+	// Close RabbitMQ consumer
+	if err := consumer.Close(); err != nil {
 		log.Fatal().Err(err).Msg("Failed to close RabbitMQ connection")
 	}
 

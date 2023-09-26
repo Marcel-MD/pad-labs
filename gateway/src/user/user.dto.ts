@@ -5,6 +5,7 @@ export class UserDto {
     id: string;
     name: string;
     email: string;
+    roles: string[];
     createdAt: Timestamp | undefined;
     updatedAt: Timestamp | undefined;
 }

@@ -7,4 +7,6 @@ const (
 
 type User struct {
 	Base
+
+	Products []Product `json:"-" gorm:"foreignKey:OwnerId;constraint:OnDelete:CASCADE;"`
 }

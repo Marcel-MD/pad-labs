@@ -11,6 +11,7 @@ import (
 
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -34,8 +35,7 @@ func NewGrpcServer(cfg config.Config, productService services.ProductService, pr
 }
 
 type grpcServer struct {
-	// pb.UnsafeProductServiceServer
-	pb.ProductServiceServer
+	pb.UnsafeProductServiceServer
 	productService services.ProductService
 	producer       mq.Producer
 }
@@ -43,7 +43,10 @@ type grpcServer struct {
 func mapProduct(product models.Product) *pb.Product {
 	return &pb.Product{
 		Id:        product.ID,
+		OwnerId:   product.OwnerId,
 		Name:      product.Name,
+		Price:     product.Price,
+		Stock:     product.Stock,
 		CreatedAt: timestamppb.New(product.CreatedAt),
 		UpdatedAt: timestamppb.New(product.UpdatedAt),
 	}
@@ -76,4 +79,54 @@ func (s *grpcServer) GetById(ctx context.Context, pbProductId *pb.ProductId) (*p
 	pbProduct := mapProduct(product)
 
 	return pbProduct, nil
+}
+
+func (s *grpcServer) Create(ctx context.Context, pbCreateProduct *pb.CreateProduct) (*pb.ProductId, error) {
+	product := models.Product{
+		OwnerId: pbCreateProduct.OwnerId,
+		Name:    pbCreateProduct.Name,
+		Price:   pbCreateProduct.Price,
+		Stock:   pbCreateProduct.Stock,
+	}
+
+	product, err := s.productService.Create(product)
+	if err != nil {
+		return nil, err
+	}
+
+	s.producer.SendMsg(models.CreateProductMsgType, product, []string{models.OrderQueue})
+
+	pbProductId := &pb.ProductId{Id: product.ID}
+
+	return pbProductId, nil
+}
+
+func (s *grpcServer) Update(ctx context.Context, pbUpdateProduct *pb.UpdateProduct) (*emptypb.Empty, error) {
+	product := models.Product{
+		Name:  pbUpdateProduct.Name,
+		Price: pbUpdateProduct.Price,
+		Stock: pbUpdateProduct.Stock,
+	}
+
+	product.ID = pbUpdateProduct.Id
+
+	product, err := s.productService.Update(product)
+	if err != nil {
+		return nil, err
+	}
+
+	s.producer.SendMsg(models.UpdateProductMsgType, product, []string{models.OrderQueue})
+
+	return &emptypb.Empty{}, nil
+}
+
+func (s *grpcServer) Delete(ctx context.Context, pbProductId *pb.ProductId) (*emptypb.Empty, error) {
+	err := s.productService.Delete(pbProductId.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	s.producer.SendMsg(models.DeleteProductMsgType, pbProductId.Id, []string{models.OrderQueue})
+
+	return &emptypb.Empty{}, nil
 }

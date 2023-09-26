@@ -9,10 +9,9 @@ import (
 type Config struct {
 	HttpPort    string `env:"HTTP_PORT" envDefault:":8090"`
 	GrpcPort    string `env:"GRPC_PORT" envDefault:":8091"`
-	AllowOrigin string `env:"ALLOW_ORIGIN" envDefault:"*"`
 	Env         string `env:"ENV" envDefault:"dev"`
 	RabbitMQUrl string `env:"RABBIT_MQ_URL" envDefault:"amqp://guest:guest@rabbitmq:5672/"`
-	DatabaseUrl string `env:"DATABASE_URL" envDefault:"postgres://postgres:password@user-db:5432/product-db"`
+	DatabaseUrl string `env:"DATABASE_URL" envDefault:"postgres://postgres:password@product-db:5432/product-db"`
 }
 
 func NewConfig() (Config, error) {

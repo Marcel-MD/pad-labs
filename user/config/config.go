@@ -9,16 +9,14 @@ import (
 )
 
 type Config struct {
-	Host        string `env:"HOST" envDefault:"localhost"`
 	HttpPort    string `env:"HTTP_PORT" envDefault:":8080"`
 	GrpcPort    string `env:"GRPC_PORT" envDefault:":8081"`
-	AllowOrigin string `env:"ALLOW_ORIGIN" envDefault:"*"`
 	Env         string `env:"ENV" envDefault:"dev"`
 	RabbitMQUrl string `env:"RABBIT_MQ_URL" envDefault:"amqp://guest:guest@rabbitmq:5672/"`
+	DatabaseUrl string `env:"DATABASE_URL" envDefault:"postgres://postgres:password@user-db:5432/user-db"`
 
 	AccessTokenSecret   string        `env:"ACCESS_TOKEN_SECRET" envDefault:"SecretAccessSecretAccess"`
 	AccessTokenLifespan time.Duration `env:"ACCESS_TOKEN_LIFESPAN" envDefault:"72h"`
-	DatabaseUrl         string        `env:"DATABASE_URL" envDefault:"postgres://postgres:password@user-db:5432/user-db"`
 }
 
 func NewConfig() (Config, error) {
