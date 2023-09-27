@@ -6,6 +6,8 @@ import {
   Param,
   Post,
   Query,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { USER_SERVICE_NAME, UserServiceClient } from './user.pb';
 import { ClientGrpc } from '@nestjs/microservices';
@@ -18,7 +20,10 @@ import {
   UsersDto,
   UsersQueryDto,
 } from './user.dto';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { UserGuard, UserRequest } from './user.guard';
 
+@ApiTags('User')
 @Controller('users')
 export class UserController {
   private svc: UserServiceClient;
@@ -48,7 +53,22 @@ export class UserController {
   private async getAll(
     @Query() query: UsersQueryDto,
   ): Promise<Observable<UsersDto>> {
-    return this.svc.getAll(query);
+    var pbQuery = {
+      page: query.page || 0,
+      size: query.size || 0,
+    };
+
+    return this.svc.getAll(pbQuery);
+  }
+
+  @ApiBearerAuth()
+  @Get('current')
+  @UseGuards(UserGuard)
+  private async createProduct(
+    @Req() req: UserRequest,
+  ): Promise<Observable<UserDto>> {
+    var id = req.user;
+    return this.svc.getById({ id });
   }
 
   @Get(':id')

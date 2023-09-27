@@ -25,7 +25,9 @@ import {
   UpdateProductDto,
 } from './product.dto';
 import { Empty } from './google/protobuf/empty.pb';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Product')
 @Controller('product')
 export class ProductController implements OnModuleInit {
   private svc: ProductServiceClient;
@@ -38,6 +40,7 @@ export class ProductController implements OnModuleInit {
       this.client.getService<ProductServiceClient>(PRODUCT_SERVICE_NAME);
   }
 
+  @ApiBearerAuth()
   @Post()
   @UseGuards(UserGuard)
   private async createProduct(
@@ -48,6 +51,7 @@ export class ProductController implements OnModuleInit {
     return this.svc.create({ ownerId, ...body });
   }
 
+  @ApiBearerAuth()
   @Put(':id')
   @UseGuards(UserGuard)
   private async updateProduct(
@@ -59,6 +63,7 @@ export class ProductController implements OnModuleInit {
     return this.svc.update({ id, ownerId, ...body });
   }
 
+  @ApiBearerAuth()
   @Delete(':id')
   @UseGuards(UserGuard)
   private async deleteProduct(
@@ -73,7 +78,13 @@ export class ProductController implements OnModuleInit {
   private async getAll(
     @Query() query: ProductsQueryDto,
   ): Promise<Observable<ProductsDto>> {
-    return this.svc.getAll(query);
+    var pbQuery = {
+      page: query.page || 0,
+      size: query.size || 0,
+      ownerId: query.ownerId || '',
+    };
+
+    return this.svc.getAll(pbQuery);
   }
 
   @Get(':id')

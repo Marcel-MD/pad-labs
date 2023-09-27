@@ -1,6 +1,7 @@
 package services
 
 import (
+	"errors"
 	"product/config"
 	"product/data/repositories"
 	"product/models"
@@ -13,7 +14,7 @@ type ProductService interface {
 	FindById(id string) (models.Product, error)
 	Create(product models.Product) (models.Product, error)
 	Update(product models.Product) (models.Product, error)
-	Delete(id string) error
+	Delete(id, ownerId string) error
 }
 
 func NewProductService(productRepository repositories.ProductRepository, userRepository repositories.UserRepository, cfg config.Config) ProductService {
@@ -55,7 +56,16 @@ func (s *productService) Create(product models.Product) (models.Product, error) 
 }
 
 func (s *productService) Update(product models.Product) (models.Product, error) {
-	err := s.productRepository.Update(&product)
+	existingProduct, err := s.productRepository.FindById(product.ID)
+	if err != nil {
+		return product, err
+	}
+
+	if existingProduct.OwnerId != product.OwnerId {
+		return product, errors.New("product does not belong to user")
+	}
+
+	err = s.productRepository.Update(&product)
 	if err != nil {
 		return product, err
 	}
@@ -63,10 +73,14 @@ func (s *productService) Update(product models.Product) (models.Product, error) 
 	return product, nil
 }
 
-func (s *productService) Delete(id string) error {
+func (s *productService) Delete(id, ownerId string) error {
 	product, err := s.productRepository.FindById(id)
 	if err != nil {
 		return err
+	}
+
+	if product.OwnerId != ownerId {
+		return errors.New("product does not belong to user")
 	}
 
 	return s.productRepository.Delete(&product)

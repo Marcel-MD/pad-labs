@@ -103,9 +103,10 @@ func (s *grpcServer) Create(ctx context.Context, pbCreateProduct *pb.CreateProdu
 
 func (s *grpcServer) Update(ctx context.Context, pbUpdateProduct *pb.UpdateProduct) (*emptypb.Empty, error) {
 	product := models.Product{
-		Name:  pbUpdateProduct.Name,
-		Price: pbUpdateProduct.Price,
-		Stock: pbUpdateProduct.Stock,
+		Name:    pbUpdateProduct.Name,
+		Price:   pbUpdateProduct.Price,
+		Stock:   pbUpdateProduct.Stock,
+		OwnerId: pbUpdateProduct.OwnerId,
 	}
 
 	product.ID = pbUpdateProduct.Id
@@ -121,7 +122,7 @@ func (s *grpcServer) Update(ctx context.Context, pbUpdateProduct *pb.UpdateProdu
 }
 
 func (s *grpcServer) Delete(ctx context.Context, pbDeleteProduct *pb.DeleteProduct) (*emptypb.Empty, error) {
-	err := s.productService.Delete(pbDeleteProduct.Id)
+	err := s.productService.Delete(pbDeleteProduct.Id, pbDeleteProduct.OwnerId)
 	if err != nil {
 		return nil, err
 	}

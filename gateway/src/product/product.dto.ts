@@ -42,7 +42,7 @@ export class UpdateProductDto {
 }
 
 export class ProductsQueryDto {
-  page: number;
-  size: number;
-  ownerId: string;
+  page?: number;
+  size?: number;
+  ownerId?: string;
 }
