@@ -23,4 +23,4 @@ import { USER_SERVICE_NAME, USER_PACKAGE_NAME } from './user.pb';
   providers: [UserService],
   exports: [UserService],
 })
-export class UserModule { }
+export class UserModule {}
