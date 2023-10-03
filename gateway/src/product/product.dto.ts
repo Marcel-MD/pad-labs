@@ -1,5 +1,5 @@
 import { Timestamp } from './google/protobuf/timestamp.pb';
-import { IsEmail, IsUUID, Length, Min } from 'class-validator';
+import { Length, Min } from 'class-validator';
 
 export class ProductDto {
   id: string;
@@ -15,7 +15,7 @@ export class ProductsDto {
   products: ProductDto[];
 }
 
-export interface ProductIdDto {
+export class ProductIdDto {
   id: string;
 }
 
