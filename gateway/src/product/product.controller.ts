@@ -10,7 +10,6 @@ import {
   Req,
   Query,
   Put,
-  Delete,
 } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
 import { Observable } from 'rxjs';
@@ -61,17 +60,6 @@ export class ProductController implements OnModuleInit {
   ): Promise<Observable<Empty>> {
     var ownerId = req.user;
     return this.svc.update({ id, ownerId, ...body });
-  }
-
-  @ApiBearerAuth()
-  @Delete(':id')
-  @UseGuards(UserGuard)
-  private async deleteProduct(
-    @Req() req: UserRequest,
-    @Param('id') id: string,
-  ): Promise<Observable<Empty>> {
-    var ownerId = req.user;
-    return this.svc.delete({ id, ownerId });
   }
 
   @Get()

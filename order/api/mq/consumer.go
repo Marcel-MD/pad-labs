@@ -2,9 +2,9 @@ package mq
 
 import (
 	"encoding/json"
-	"product/config"
-	"product/models"
-	"product/services"
+	"order/config"
+	"order/models"
+	"order/services"
 	"time"
 
 	"github.com/rs/zerolog/log"
@@ -21,10 +21,10 @@ type consumer struct {
 	consumer       *rabbitmq.Consumer
 	userService    services.UserService
 	productService services.ProductService
-	producer       Producer
+	orderService   services.OrderService
 }
 
-func NewConsumer(cfg config.Config, userService services.UserService, productService services.ProductService, producer Producer) (Consumer, error) {
+func NewConsumer(cfg config.Config, userService services.UserService, productService services.ProductService, orderService services.OrderService) (Consumer, error) {
 	log.Info().Msg("Creating new RabbitMQ consumer")
 
 	const retries = 5
@@ -51,13 +51,13 @@ func NewConsumer(cfg config.Config, userService services.UserService, productSer
 		conn:           conn,
 		userService:    userService,
 		productService: productService,
-		producer:       producer,
+		orderService:   orderService,
 	}
 
 	cons, err := rabbitmq.NewConsumer(
 		conn,
 		c.handleDelivery,
-		models.ProductQueue,
+		models.OrderQueue,
 		rabbitmq.WithConsumerOptionsQueueDurable,
 	)
 	if err != nil {
@@ -100,44 +100,33 @@ func (c *consumer) handleDelivery(d rabbitmq.Delivery) rabbitmq.Action {
 			return rabbitmq.Ack
 		}
 
-	case models.CreateOrderMsgType:
-		var order models.OrderMessage
+	case models.CreateProductMsgType:
+		var product models.Product
+		err := json.Unmarshal(msg.Data, &product)
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to unmarshal product")
+			return rabbitmq.NackDiscard
+		}
+
+		_, err = c.productService.Create(product)
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to create product")
+			return rabbitmq.Ack
+		}
+
+	case models.UpdateOrderMsgType:
+		var order models.UpdateOrder
 		err := json.Unmarshal(msg.Data, &order)
 		if err != nil {
 			log.Error().Err(err).Msg("Failed to unmarshal order")
 			return rabbitmq.NackDiscard
 		}
 
-		product, err := c.productService.FindById(order.ProductId)
+		_, err = c.orderService.Update(order)
 		if err != nil {
-			log.Error().Err(err).Msg("Failed to find product")
+			log.Error().Err(err).Msg("Failed to update order")
 			return rabbitmq.Ack
 		}
-
-		if product.Stock < order.Quantity {
-			log.Warn().Msg("Insufficient stock")
-			c.producer.SendMsg(models.UpdateOrderMsgType, models.UpdateOrderMessage{
-				ID:             order.ID,
-				ProductOwnerId: product.OwnerId,
-				Status:         models.CanceledStatus,
-				Cost:           0,
-			}, []string{models.OrderQueue})
-			return rabbitmq.Ack
-		}
-
-		product.Stock -= order.Quantity
-		product, err = c.productService.Update(product)
-		if err != nil {
-			log.Error().Err(err).Msg("Failed to update product")
-			return rabbitmq.Ack
-		}
-
-		c.producer.SendMsg(models.UpdateOrderMsgType, models.UpdateOrderMessage{
-			ID:             order.ID,
-			ProductOwnerId: product.OwnerId,
-			Status:         models.ShippedStatus,
-			Cost:           product.Price * order.Quantity,
-		}, []string{models.OrderQueue})
 	}
 
 	return rabbitmq.Ack

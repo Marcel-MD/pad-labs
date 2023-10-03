@@ -12,7 +12,6 @@ service ProductService {
     rpc GetById (ProductId) returns (Product);
     rpc Create (CreateProduct) returns (ProductId);
     rpc Update (UpdateProduct) returns (google.protobuf.Empty);
-    rpc Delete (DeleteProduct) returns (google.protobuf.Empty);
 }
 
 message Product {
@@ -44,11 +43,6 @@ message UpdateProduct {
     string name = 3;
     int64 price = 4;
     int64 stock = 5;
-}
-
-message DeleteProduct {
-    string id = 1;
-    string owner_id = 2;
 }
 
 message ProductId {

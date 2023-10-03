@@ -10,7 +10,6 @@ export interface Order {
   id: string;
   productId: string;
   userId: string;
-  productOwnerId: string;
   quantity: number;
   cost: number;
   status: string;
@@ -26,16 +25,15 @@ export interface Orders {
 export interface CreateOrder {
   productId: string;
   userId: string;
-  productOwnerId: string;
   quantity: number;
-  cost: number;
-  status: string;
   shippingAddress: string;
 }
 
 export interface UpdateOrder {
   id: string;
+  productOwnerId: string;
   status: string;
+  cost: number;
 }
 
 export interface OrderId {

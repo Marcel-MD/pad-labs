@@ -18,15 +18,14 @@ message Order {
     string id = 1;
     string product_id = 2;
     string user_id = 3;
-    string product_owner_id = 4;
 
-    int64 quantity = 5;
-    int64 cost = 6;
-    string status = 7;
-    string shipping_address = 8;
+    int64 quantity = 4;
+    int64 cost = 5;
+    string status = 6;
+    string shipping_address = 7;
 
-    google.protobuf.Timestamp created_at = 9;
-    google.protobuf.Timestamp updated_at = 10;
+    google.protobuf.Timestamp created_at = 8;
+    google.protobuf.Timestamp updated_at = 9;
 }
 
 message Orders {
@@ -36,16 +35,15 @@ message Orders {
 message CreateOrder {
     string product_id = 1;
     string user_id = 2;
-    string product_owner_id = 3;
-    int64 quantity = 4;
-    int64 cost = 5;
-    string status = 6;
-    string shipping_address = 7;
+    int64 quantity = 3;
+    string shipping_address = 4;
 }
 
 message UpdateOrder {
     string id = 1;
-    string status = 2;
+    string product_owner_id = 2;
+    string status = 3;
+    int64 cost = 4;
 }
 
 message OrderId {

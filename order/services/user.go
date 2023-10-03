@@ -1,9 +1,9 @@
 package services
 
 import (
-	"product/config"
-	"product/data/repositories"
-	"product/models"
+	"order/config"
+	"order/data/repositories"
+	"order/models"
 
 	"github.com/rs/zerolog/log"
 )

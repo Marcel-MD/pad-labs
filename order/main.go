@@ -6,12 +6,12 @@ import (
 	"os/signal"
 	"syscall"
 
-	"product/api"
-	"product/api/mq"
-	"product/config"
-	"product/data"
-	"product/data/repositories"
-	"product/services"
+	"order/api"
+	"order/api/mq"
+	"order/config"
+	"order/data"
+	"order/data/repositories"
+	"order/services"
 
 	"github.com/rs/zerolog/log"
 )
@@ -42,14 +42,18 @@ func main() {
 	productRepository := repositories.NewProductRepository(db)
 	productService := services.NewProductService(productRepository, userRepository, cfg)
 
+	// Order
+	orderRepository := repositories.NewOrderRepository(db)
+	orderService := services.NewOrderService(orderRepository, userRepository, productRepository, cfg)
+
 	// RabbitMQ Consumer
-	consumer, err := mq.NewConsumer(cfg, userService, productService, producer)
+	consumer, err := mq.NewConsumer(cfg, userService, productService, orderService)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to create RabbitMQ consumer")
 	}
 
 	// Start GRPC Server
-	grpcSrv, listener, err := api.NewGrpcServer(cfg, productService, producer)
+	grpcSrv, listener, err := api.NewGrpcServer(cfg, orderService, producer)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to create gRPC server")
 	}

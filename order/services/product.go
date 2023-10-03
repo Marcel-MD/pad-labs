@@ -1,10 +1,9 @@
 package services
 
 import (
-	"errors"
-	"product/config"
-	"product/data/repositories"
-	"product/models"
+	"order/config"
+	"order/data/repositories"
+	"order/models"
 
 	"github.com/rs/zerolog/log"
 )
@@ -13,7 +12,6 @@ type ProductService interface {
 	FindAll(query models.PaginationQuery) ([]models.Product, error)
 	FindById(id string) (models.Product, error)
 	Create(product models.Product) (models.Product, error)
-	Update(product models.Product) (models.Product, error)
 }
 
 func NewProductService(productRepository repositories.ProductRepository, userRepository repositories.UserRepository, cfg config.Config) ProductService {
@@ -47,24 +45,6 @@ func (s *productService) Create(product models.Product) (models.Product, error) 
 	}
 
 	err = s.productRepository.Create(&product)
-	if err != nil {
-		return product, err
-	}
-
-	return product, nil
-}
-
-func (s *productService) Update(product models.Product) (models.Product, error) {
-	existingProduct, err := s.productRepository.FindById(product.ID)
-	if err != nil {
-		return product, err
-	}
-
-	if existingProduct.OwnerId != product.OwnerId {
-		return product, errors.New("product does not belong to user")
-	}
-
-	err = s.productRepository.Update(&product)
 	if err != nil {
 		return product, err
 	}

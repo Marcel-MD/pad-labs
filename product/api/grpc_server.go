@@ -94,7 +94,12 @@ func (s *grpcServer) Create(ctx context.Context, pbCreateProduct *pb.CreateProdu
 		return nil, err
 	}
 
-	s.producer.SendMsg(models.CreateProductMsgType, product, []string{models.OrderQueue})
+	productMsg := models.ProductMessage{
+		Base:    product.Base,
+		OwnerId: product.OwnerId,
+	}
+
+	s.producer.SendMsg(models.CreateProductMsgType, productMsg, []string{models.OrderQueue})
 
 	pbProductId := &pb.ProductId{Id: product.ID}
 
@@ -115,19 +120,6 @@ func (s *grpcServer) Update(ctx context.Context, pbUpdateProduct *pb.UpdateProdu
 	if err != nil {
 		return nil, err
 	}
-
-	s.producer.SendMsg(models.UpdateProductMsgType, product, []string{models.OrderQueue})
-
-	return &emptypb.Empty{}, nil
-}
-
-func (s *grpcServer) Delete(ctx context.Context, pbDeleteProduct *pb.DeleteProduct) (*emptypb.Empty, error) {
-	err := s.productService.Delete(pbDeleteProduct.Id, pbDeleteProduct.OwnerId)
-	if err != nil {
-		return nil, err
-	}
-
-	s.producer.SendMsg(models.DeleteProductMsgType, pbDeleteProduct.Id, []string{models.OrderQueue})
 
 	return &emptypb.Empty{}, nil
 }

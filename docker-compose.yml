@@ -24,6 +24,7 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - user-db
+      - rabbitmq
     ports:
       - 8080:8080
       - 8081:8081
@@ -42,9 +43,29 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - product-db
+      - rabbitmq
     ports:
       - 8090:8090
       - 8091:8091
+
+  order-db:
+    image: postgres:latest
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: order-db
+    volumes:
+      - order-db:/data/postgres
+
+  order:
+    build:
+      context: ./order
+      dockerfile: Dockerfile
+    depends_on:
+      - order-db
+      - rabbitmq
+    ports:
+      - 8070:8070
+      - 8071:8071
 
   redis:
     image: redis
@@ -59,6 +80,7 @@ services:
       - redis
       - user
       - product
+      - order
     ports:
       - 3000:3000
 
@@ -67,3 +89,4 @@ volumes:
   rabbitmq-log:
   user-db:
   product-db:
+  order-db:

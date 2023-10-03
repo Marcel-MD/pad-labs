@@ -35,11 +35,6 @@ export interface UpdateProduct {
   stock: number;
 }
 
-export interface DeleteProduct {
-  id: string;
-  ownerId: string;
-}
-
 export interface ProductId {
   id: string;
 }
@@ -60,8 +55,6 @@ export interface ProductServiceClient {
   create(request: CreateProduct): Observable<ProductId>;
 
   update(request: UpdateProduct): Observable<Empty>;
-
-  delete(request: DeleteProduct): Observable<Empty>;
 }
 
 export interface ProductServiceController {
@@ -72,13 +65,11 @@ export interface ProductServiceController {
   create(request: CreateProduct): Promise<ProductId> | Observable<ProductId> | ProductId;
 
   update(request: UpdateProduct): void;
-
-  delete(request: DeleteProduct): void;
 }
 
 export function ProductServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ["getAll", "getById", "create", "update", "delete"];
+    const grpcMethods: string[] = ["getAll", "getById", "create", "update"];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
       GrpcMethod("ProductService", method)(constructor.prototype[method], method, descriptor);
