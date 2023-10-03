@@ -1,6 +1,7 @@
 package main
 
 import (
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -48,6 +49,14 @@ func main() {
 		}
 	}()
 
+	// Start HTTP Server
+	http.HandleFunc("/", statusHandler)
+	go func() {
+		if err := http.ListenAndServe(cfg.HttpPort, nil); err != nil {
+			log.Fatal().Err(err).Msg("Failed to start HTTP server")
+		}
+	}()
+
 	// Graceful shutdown
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, syscall.SIGSEGV)
@@ -66,4 +75,10 @@ func main() {
 	if err := data.CloseDB(db); err != nil {
 		log.Fatal().Err(err).Msg("Failed to close db connection")
 	}
+}
+
+func statusHandler(w http.ResponseWriter, r *http.Request) {
+	responseJSON := []byte(`{"status": "ok"}`)
+	w.WriteHeader(http.StatusOK)
+	w.Write(responseJSON)
 }
