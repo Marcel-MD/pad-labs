@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { USER_SERVICE_NAME, UserServiceClient } from './user.pb';
 import { ClientGrpc } from '@nestjs/microservices';
-import { Observable } from 'rxjs';
+import { Observable, timeout } from 'rxjs';
 import {
   LoginUserDto,
   RegisterUserDto,
@@ -22,6 +22,8 @@ import {
 } from './user.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UserGuard, UserRequest } from './user.guard';
+
+const TIMEOUT = 5000;
 
 @ApiTags('User')
 @Controller('users')
@@ -39,14 +41,14 @@ export class UserController {
   private async register(
     @Body() body: RegisterUserDto,
   ): Promise<Observable<TokenDto>> {
-    return this.svc.register(body);
+    return this.svc.register(body).pipe(timeout(TIMEOUT));
   }
 
   @Post('login')
   private async login(
     @Body() body: LoginUserDto,
   ): Promise<Observable<TokenDto>> {
-    return this.svc.login(body);
+    return this.svc.login(body).pipe(timeout(TIMEOUT));
   }
 
   @Get()
@@ -58,7 +60,7 @@ export class UserController {
       size: query.size || 0,
     };
 
-    return this.svc.getAll(pbQuery);
+    return this.svc.getAll(pbQuery).pipe(timeout(TIMEOUT));
   }
 
   @ApiBearerAuth()
@@ -68,11 +70,11 @@ export class UserController {
     @Req() req: UserRequest,
   ): Promise<Observable<UserDto>> {
     var id = req.user;
-    return this.svc.getById({ id });
+    return this.svc.getById({ id }).pipe(timeout(TIMEOUT));
   }
 
   @Get(':id')
   private async getById(@Param('id') id: string): Promise<Observable<UserDto>> {
-    return this.svc.getById({ id });
+    return this.svc.getById({ id }).pipe(timeout(TIMEOUT));
   }
 }

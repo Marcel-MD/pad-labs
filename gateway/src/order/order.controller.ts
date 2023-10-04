@@ -12,7 +12,7 @@ import {
   Put,
 } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
-import { Observable } from 'rxjs';
+import { Observable, timeout } from 'rxjs';
 import { OrderServiceClient, ORDER_SERVICE_NAME } from './order.pb';
 import { UserGuard, UserRequest } from '../user/user.guard';
 import {
@@ -25,6 +25,8 @@ import {
 } from './order.dto';
 import { Empty } from './google/protobuf/empty.pb';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+
+const TIMEOUT = 5000;
 
 @ApiTags('Order')
 @Controller('order')
@@ -47,7 +49,9 @@ export class OrderController implements OnModuleInit {
     @Body() body: CreateOrderDto,
   ): Promise<Observable<OrderIdDto>> {
     var userId = req.user;
-    return this.svc.create({ userId, productId, ...body });
+    return this.svc
+      .create({ userId, productId, ...body })
+      .pipe(timeout(TIMEOUT));
   }
 
   @ApiBearerAuth()
@@ -59,7 +63,9 @@ export class OrderController implements OnModuleInit {
     @Body() body: UpdateOrderDto,
   ): Promise<Observable<Empty>> {
     var productOwnerId = req.user;
-    return this.svc.update({ id, productOwnerId, ...body });
+    return this.svc
+      .update({ id, productOwnerId, ...body })
+      .pipe(timeout(TIMEOUT));
   }
 
   @Get()
@@ -73,13 +79,13 @@ export class OrderController implements OnModuleInit {
       userId: query.userId || '',
     };
 
-    return this.svc.getAll(pbQuery);
+    return this.svc.getAll(pbQuery).pipe(timeout(TIMEOUT));
   }
 
   @Get(':id')
   private async getById(
     @Param('id') id: string,
   ): Promise<Observable<OrderDto>> {
-    return this.svc.getById({ id });
+    return this.svc.getById({ id }).pipe(timeout(TIMEOUT));
   }
 }

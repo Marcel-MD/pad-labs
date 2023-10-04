@@ -12,7 +12,7 @@ import {
   Put,
 } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
-import { Observable } from 'rxjs';
+import { Observable, timeout } from 'rxjs';
 import { ProductServiceClient, PRODUCT_SERVICE_NAME } from './product.pb';
 import { UserGuard, UserRequest } from '../user/user.guard';
 import {
@@ -25,6 +25,8 @@ import {
 } from './product.dto';
 import { Empty } from './google/protobuf/empty.pb';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+
+const TIMEOUT = 5000;
 
 @ApiTags('Product')
 @Controller('product')
@@ -47,7 +49,7 @@ export class ProductController implements OnModuleInit {
     @Body() body: CreateProductDto,
   ): Promise<Observable<ProductIdDto>> {
     var ownerId = req.user;
-    return this.svc.create({ ownerId, ...body });
+    return this.svc.create({ ownerId, ...body }).pipe(timeout(TIMEOUT));
   }
 
   @ApiBearerAuth()
@@ -59,7 +61,7 @@ export class ProductController implements OnModuleInit {
     @Body() body: UpdateProductDto,
   ): Promise<Observable<Empty>> {
     var ownerId = req.user;
-    return this.svc.update({ id, ownerId, ...body });
+    return this.svc.update({ id, ownerId, ...body }).pipe(timeout(TIMEOUT));
   }
 
   @Get()
@@ -72,13 +74,13 @@ export class ProductController implements OnModuleInit {
       ownerId: query.ownerId || '',
     };
 
-    return this.svc.getAll(pbQuery);
+    return this.svc.getAll(pbQuery).pipe(timeout(TIMEOUT));
   }
 
   @Get(':id')
   private async getById(
     @Param('id') id: string,
   ): Promise<Observable<ProductDto>> {
-    return this.svc.getById({ id });
+    return this.svc.getById({ id }).pipe(timeout(TIMEOUT));
   }
 }
