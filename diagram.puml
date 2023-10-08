@@ -1,18 +1,17 @@
 @startuml
 
-[API Gateway (JS)] as AG
+[API Gateway (NestJS)] as AG
 database "Redis Cache" as RDB
-[Service Discovery (JS)] as SD
 node RabbitMQ as MQ
 
-[User Service (GO)] as US
+[User Service (Go)] as US
 database "User DB" as UDB
-[Product Service (GO)] as PS
+[Product Service (Go)] as PS
 database "Product DB" as PDB
-[Order Service (GO)] as OS
+[Order Service (Go)] as OS
 database "Order DB" as ODB
 
-AG -left- RDB
+AG -right- RDB
 AG --> US : gRPC
 AG --> PS : gRPC
 AG --> OS : gRPC
@@ -24,10 +23,5 @@ OS - ODB
 US <--> MQ : AMQP
 PS <--> MQ : AMQP
 OS <--> MQ : AMQP
-
-AG .> SD
-SD <.. US
-SD <.. PS
-SD <.. OS
 
 @enduml

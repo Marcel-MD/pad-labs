@@ -16,8 +16,6 @@ export class AllExceptionFilter implements ExceptionFilter {
     // constructor method, thus we should resolve it here.
     const { httpAdapter } = this.httpAdapterHost;
 
-    console.log(exception);
-
     const ctx = host.switchToHttp();
 
     if (exception instanceof HttpException) {
@@ -37,12 +35,12 @@ export class AllExceptionFilter implements ExceptionFilter {
       message: 'Unknown error',
     };
 
-    if (
-      typeof exception === 'object' &&
-      exception !== null &&
-      exception.hasOwnProperty('details')
-    ) {
-      responseBody.message = exception['details'];
+    if (typeof exception === 'object' && exception !== null) {
+      if (exception.hasOwnProperty('details')) {
+        responseBody.message = exception['details'];
+      } else if (exception.hasOwnProperty('message')) {
+        responseBody.message = exception['message'];
+      }
     }
 
     httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus);

@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"fmt"
 	"net"
 	"order/api/mq"
 	"order/api/pb"
@@ -9,13 +10,15 @@ import (
 	"order/models"
 	"order/services"
 
+	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
+	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func NewGrpcServer(cfg config.Config, orderService services.OrderService, producer mq.Producer) (*grpc.Server, net.Listener, error) {
+func NewGrpcServer(cfg config.Config, orderService services.OrderService, producer mq.Producer, logger zerolog.Logger) (*grpc.Server, net.Listener, error) {
 	log.Info().Msg("Creating new GRPC server")
 
 	server := &grpcServer{
@@ -28,7 +31,11 @@ func NewGrpcServer(cfg config.Config, orderService services.OrderService, produc
 		return nil, nil, err
 	}
 
-	srv := grpc.NewServer()
+	srv := grpc.NewServer(
+		grpc.ChainUnaryInterceptor(
+			logging.UnaryServerInterceptor(InterceptorLogger(logger), logging.WithLogOnEvents(logging.StartCall, logging.FinishCall)),
+		),
+	)
 	pb.RegisterOrderServiceServer(srv, server)
 
 	return srv, listener, nil
@@ -117,4 +124,23 @@ func (s *grpcServer) Update(ctx context.Context, pbUpdateOrder *pb.UpdateOrder) 
 	}
 
 	return &emptypb.Empty{}, nil
+}
+
+func InterceptorLogger(l zerolog.Logger) logging.Logger {
+	return logging.LoggerFunc(func(ctx context.Context, lvl logging.Level, msg string, fields ...any) {
+		l := l.With().Fields(fields).Logger()
+
+		switch lvl {
+		case logging.LevelDebug:
+			l.Debug().Msg(msg)
+		case logging.LevelInfo:
+			l.Info().Msg(msg)
+		case logging.LevelWarn:
+			l.Warn().Msg(msg)
+		case logging.LevelError:
+			l.Error().Msg(msg)
+		default:
+			panic(fmt.Sprintf("unknown level %v", lvl))
+		}
+	})
 }

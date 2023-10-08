@@ -13,14 +13,19 @@ import (
 	"order/data/repositories"
 	"order/services"
 
+	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
 
 func main() {
+	// Config
 	cfg, err := config.NewConfig()
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to load config")
 	}
+
+	// Logger
+	logger := zerolog.New(os.Stderr)
 
 	// DB
 	db, err := data.NewDB(cfg)
@@ -53,7 +58,7 @@ func main() {
 	}
 
 	// Start GRPC Server
-	grpcSrv, listener, err := api.NewGrpcServer(cfg, orderService, producer)
+	grpcSrv, listener, err := api.NewGrpcServer(cfg, orderService, producer, logger)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to create gRPC server")
 	}

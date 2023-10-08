@@ -10,9 +10,10 @@ import {
   Req,
   Query,
   Put,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
-import { Observable, timeout } from 'rxjs';
+import { Observable, TimeoutError, throwError, timeout } from 'rxjs';
 import { OrderServiceClient, ORDER_SERVICE_NAME } from './order.pb';
 import { UserGuard, UserRequest } from '../user/user.guard';
 import {
@@ -25,11 +26,25 @@ import {
 } from './order.dto';
 import { Empty } from './google/protobuf/empty.pb';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
-const TIMEOUT = 5000;
+var nrOfTimeouts = 0;
+
+const TIMEOUT = {
+  each: 2000,
+  with: () =>
+    throwError(() => {
+      nrOfTimeouts++;
+      if (nrOfTimeouts > 2) {
+        console.error('Order services timeout 3 times');
+      }
+      return new TimeoutError();
+    }),
+};
 
 @ApiTags('Order')
 @Controller('order')
+@UseInterceptors(CacheInterceptor)
 export class OrderController implements OnModuleInit {
   private svc: OrderServiceClient;
 

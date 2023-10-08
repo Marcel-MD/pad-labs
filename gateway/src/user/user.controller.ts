@@ -8,10 +8,11 @@ import {
   Query,
   Req,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { USER_SERVICE_NAME, UserServiceClient } from './user.pb';
 import { ClientGrpc } from '@nestjs/microservices';
-import { Observable, timeout } from 'rxjs';
+import { Observable, TimeoutError, throwError, timeout } from 'rxjs';
 import {
   LoginUserDto,
   RegisterUserDto,
@@ -22,11 +23,25 @@ import {
 } from './user.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UserGuard, UserRequest } from './user.guard';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
-const TIMEOUT = 5000;
+var nrOfTimeouts = 0;
+
+const TIMEOUT = {
+  each: 2000,
+  with: () =>
+    throwError(() => {
+      nrOfTimeouts++;
+      if (nrOfTimeouts > 2) {
+        console.error('User services timeout 3 times');
+      }
+      return new TimeoutError();
+    }),
+};
 
 @ApiTags('User')
 @Controller('users')
+@UseInterceptors(CacheInterceptor)
 export class UserController {
   private svc: UserServiceClient;
 
