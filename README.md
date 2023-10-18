@@ -40,11 +40,10 @@ $ kubectl delete -f ./infra.yaml
 1. Access Swagger UI at [localhost:3000/api](http://localhost:3000/api).
 2. Register a user with the `POST /users/register` endpoint.
 3. Login with the `POST /users/login` endpoint. (optional)
-4. Access the `GET /users/me` endpoint to see your user details. (optional)
-5. Copy the access token from the response body.
-6. Set the access token in the `Authorize` button from the top right corner of the Swagger UI.
-7. Create a product with the `POST /products` endpoint.
-8. Order a product with the `POST /orders/:productId` endpoint.
+4. Copy the access token from the response body.
+5. Set the access token in the `Authorize` button from the top right corner of the Swagger UI.
+6. Create a product with the `POST /products` endpoint.
+7. Order a product with the `POST /orders/:productId` endpoint.
 
 You can find the internal endpoints specification in `/proto` folder.
 
