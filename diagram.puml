@@ -1,5 +1,8 @@
 @startuml
 
+[Grafana] as GR
+[Prometheus] as PR
+
 [API Gateway (NestJS)] as AG
 database "Redis Cache" as RDB
 node RabbitMQ as MQ
@@ -10,6 +13,8 @@ database "User DB" as UDB
 database "Product DB" as PDB
 [Order Service (Go)] as OS
 database "Order DB" as ODB
+[ETL] as ETL
+database "Data Warehouse" as DW
 
 AG -right- RDB
 AG --> US : gRPC
@@ -18,10 +23,24 @@ AG --> OS : gRPC
 
 US -down- UDB
 PS -down- PDB
-OS - ODB
+OS -down- ODB
 
+OS <-right-> PS : 2 Phase Commit
+US -right[hidden]- OS
 US <--> MQ : AMQP
 PS <--> MQ : AMQP
 OS <--> MQ : AMQP
+
+GR -> PR : HTTP
+PR -> AG : HTTP
+PR --> US : HTTP
+PR --> OS : HTTP
+PR --> PS : HTTP
+
+UDB <-- ETL
+PDB <-- ETL
+ODB <-- ETL
+
+ETL - DW
 
 @enduml
