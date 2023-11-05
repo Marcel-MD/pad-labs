@@ -10,15 +10,26 @@ import (
 	"user/models"
 	"user/services"
 
+	grpcprom "github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func NewGrpcServer(cfg config.Config, userService services.UserService, producer mq.Producer, logger zerolog.Logger) (*grpc.Server, net.Listener, error) {
+func NewGrpcServer(cfg config.Config, userService services.UserService, producer mq.Producer, logger zerolog.Logger) (*grpc.Server, net.Listener, *prometheus.Registry, error) {
 	log.Info().Msg("Creating new GRPC server")
+
+	// Setup metrics.
+	srvMetrics := grpcprom.NewServerMetrics(
+		grpcprom.WithServerHandlingTimeHistogram(
+			grpcprom.WithHistogramBuckets([]float64{0.001, 0.01, 0.1, 0.3, 0.6, 1, 3, 6, 9, 20, 30, 60, 90, 120}),
+		),
+	)
+	reg := prometheus.NewRegistry()
+	reg.MustRegister(srvMetrics)
 
 	server := &grpcServer{
 		userService: userService,
@@ -27,17 +38,18 @@ func NewGrpcServer(cfg config.Config, userService services.UserService, producer
 
 	listener, err := net.Listen("tcp", cfg.GrpcPort)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	srv := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
 			logging.UnaryServerInterceptor(InterceptorLogger(logger), logging.WithLogOnEvents(logging.StartCall, logging.FinishCall)),
+			srvMetrics.UnaryServerInterceptor(),
 		),
 	)
 	pb.RegisterUserServiceServer(srv, server)
 
-	return srv, listener, nil
+	return srv, listener, reg, nil
 }
 
 type grpcServer struct {

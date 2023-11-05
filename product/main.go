@@ -13,6 +13,7 @@ import (
 	"product/data/repositories"
 	"product/services"
 
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
@@ -54,7 +55,7 @@ func main() {
 	}
 
 	// Start GRPC Server
-	grpcSrv, listener, err := api.NewGrpcServer(cfg, productService, producer, logger)
+	grpcSrv, listener, reg, err := api.NewGrpcServer(cfg, productService, producer, logger)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to create gRPC server")
 	}
@@ -66,6 +67,7 @@ func main() {
 
 	// Start HTTP Server
 	http.HandleFunc("/", statusHandler)
+	http.Handle("/metrics", promhttp.HandlerFor(reg, promhttp.HandlerOpts{}))
 	go func() {
 		if err := http.ListenAndServe(cfg.HttpPort, nil); err != nil {
 			log.Fatal().Err(err).Msg("Failed to start HTTP server")

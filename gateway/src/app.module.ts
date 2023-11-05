@@ -11,10 +11,12 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { RedisClientOptions } from 'redis';
 import * as redisStore from 'cache-manager-redis-store';
 import { LoggerMiddleware } from './logger.middleware';
+import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    PrometheusModule.register(),
     CacheModule.register<RedisClientOptions>({
       isGlobal: true,
       store: redisStore,

@@ -37,7 +37,7 @@ $ kubectl delete -f ./infra.yaml
 ## Use the Application
 
 0. Run the application as mentioned above.
-1. Access Swagger UI at [localhost:3000/api](http://localhost:3000/api).
+1. Access Swagger UI at [localhost:3010/api](http://localhost:3010/api).
 2. Register a user with the `POST /users/register` endpoint.
 3. Login with the `POST /users/login` endpoint. (optional)
 4. Copy the access token from the response body.
@@ -46,6 +46,14 @@ $ kubectl delete -f ./infra.yaml
 7. Order a product with the `POST /orders/:productId` endpoint.
 
 You can find the internal endpoints specification in `/proto` folder.
+
+## Monitor the Application
+
+0. Access Prometheus at [localhost:9090](http://localhost:9090).
+1. Access Grafana at [localhost:3000](http://localhost:3000).
+2. Login using credentials: `admin` and `password`.
+3. Open the `Dashboards` tab from the left side menu.
+4. Select `Microservices Metrics` dashboard.
 
 ## System Architecture Diagram
 

@@ -31,3 +31,10 @@ scrape_configs:
     static_configs:
       - targets:
           - product:8090
+  - job_name: gateway
+    honor_timestamps: true
+    metrics_path: /metrics
+    scheme: http
+    static_configs:
+      - targets:
+          - gateway:3010

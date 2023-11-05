@@ -39,7 +39,7 @@ func TestGrpcServer_Register(t *testing.T) {
 		AccessTokenLifespan: 72 * time.Hour,
 	}
 
-	server, listener, err := NewGrpcServer(cfg, mockUserService, mockProducer, zerolog.New(os.Stderr))
+	server, listener, _, err := NewGrpcServer(cfg, mockUserService, mockProducer, zerolog.New(os.Stderr))
 	require.NoError(t, err)
 
 	go func() {
@@ -103,7 +103,7 @@ func TestGrpcServer_Login(t *testing.T) {
 		AccessTokenLifespan: 72 * time.Hour,
 	}
 
-	server, listener, err := NewGrpcServer(cfg, mockUserService, mockProducer, zerolog.New(os.Stderr))
+	server, listener, _, err := NewGrpcServer(cfg, mockUserService, mockProducer, zerolog.New(os.Stderr))
 	require.NoError(t, err)
 
 	go func() {
@@ -165,7 +165,7 @@ func TestGrpcServer_Validate(t *testing.T) {
 		AccessTokenLifespan: 72 * time.Hour,
 	}
 
-	server, listener, err := NewGrpcServer(cfg, mockUserService, mockProducer, zerolog.New(os.Stderr))
+	server, listener, _, err := NewGrpcServer(cfg, mockUserService, mockProducer, zerolog.New(os.Stderr))
 	require.NoError(t, err)
 
 	go func() {
@@ -239,7 +239,7 @@ func TestGrpcServer_GetAll(t *testing.T) {
 		AccessTokenLifespan: 72 * time.Hour,
 	}
 
-	server, listener, err := NewGrpcServer(cfg, mockUserService, mockProducer, zerolog.New(os.Stderr))
+	server, listener, _, err := NewGrpcServer(cfg, mockUserService, mockProducer, zerolog.New(os.Stderr))
 	require.NoError(t, err)
 
 	go func() {
@@ -333,7 +333,7 @@ func TestGrpcServer_GetById(t *testing.T) {
 		AccessTokenLifespan: 72 * time.Hour,
 	}
 
-	server, listener, err := NewGrpcServer(cfg, mockUserService, mockProducer, zerolog.New(os.Stderr))
+	server, listener, _, err := NewGrpcServer(cfg, mockUserService, mockProducer, zerolog.New(os.Stderr))
 	require.NoError(t, err)
 
 	go func() {

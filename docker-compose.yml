@@ -82,7 +82,7 @@ services:
       - product
       - order
     ports:
-      - 3000:3000
+      - 3010:3010
 
   prometheus:
     image: prom/prometheus
@@ -97,7 +97,7 @@ services:
   grafana:
     image: grafana/grafana
     ports:
-      - 3010:3010
+      - 3000:3000
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=password

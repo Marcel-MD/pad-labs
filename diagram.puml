@@ -25,7 +25,7 @@ US -down- UDB
 PS -down- PDB
 OS -down- ODB
 
-OS <-right-> PS : 2 Phase Commit
+OS <.right.> PS : 2 Phase Commit
 US -right[hidden]- OS
 US <--> MQ : AMQP
 PS <--> MQ : AMQP
