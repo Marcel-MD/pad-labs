@@ -13,8 +13,6 @@ services:
     environment:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: user-db
-    ports:
-      - 5432:5432
     volumes:
       - user-db:/data/postgres
 
@@ -105,10 +103,33 @@ services:
     volumes:
       - ./grafana:/etc/grafana/provisioning/
 
+  warehouse:
+    image: postgres:latest
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: warehouse
+    volumes:
+      - warehouse:/data/postgres
+
+  etl:
+    build:
+      context: ./etl
+      dockerfile: Dockerfile
+    depends_on:
+      - warehouse
+      - user-db
+      - product-db
+      - order-db
+    ports:
+      - 8060:8060
+
 volumes:
   rabbitmq-data:
   rabbitmq-log:
   user-db:
   product-db:
   order-db:
+  warehouse:
   prom_data:
