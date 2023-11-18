@@ -28,19 +28,7 @@ import { Empty } from './google/protobuf/empty.pb';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 
-var nrOfTimeouts = 0;
-
-const TIMEOUT = {
-  each: 2000,
-  with: () =>
-    throwError(() => {
-      nrOfTimeouts++;
-      if (nrOfTimeouts > 2) {
-        console.error('Product services timeout 3 times');
-      }
-      return new TimeoutError();
-    }),
-};
+const TIMEOUT = 5000;
 
 @ApiTags('Product')
 @Controller('product')

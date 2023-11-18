@@ -26,7 +26,7 @@ import { PrometheusModule } from '@willsoto/nestjs-prometheus';
     ThrottlerModule.forRoot([
       {
         ttl: 1000,
-        limit: 10,
+        limit: 100,
       },
     ]),
     UserModule,

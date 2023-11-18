@@ -25,19 +25,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UserGuard, UserRequest } from './user.guard';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 
-var nrOfTimeouts = 0;
-
-const TIMEOUT = {
-  each: 2000,
-  with: () =>
-    throwError(() => {
-      nrOfTimeouts++;
-      if (nrOfTimeouts > 2) {
-        console.error('User services timeout 3 times');
-      }
-      return new TimeoutError();
-    }),
-};
+const TIMEOUT = 5000;
 
 @ApiTags('User')
 @Controller('users')
