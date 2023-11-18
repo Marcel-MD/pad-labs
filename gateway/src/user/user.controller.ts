@@ -8,11 +8,10 @@ import {
   Query,
   Req,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
-import { USER_SERVICE_NAME, UserServiceClient } from './user.pb';
+import { USER_SERVICE_NAME, UserServiceClient, Users } from './user.pb';
 import { ClientGrpc } from '@nestjs/microservices';
-import { Observable, TimeoutError, throwError, timeout } from 'rxjs';
+import { Observable, firstValueFrom, timeout } from 'rxjs';
 import {
   LoginUserDto,
   RegisterUserDto,
@@ -23,13 +22,11 @@ import {
 } from './user.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UserGuard, UserRequest } from './user.guard';
-import { CacheInterceptor } from '@nestjs/cache-manager';
 
 const TIMEOUT = 5000;
 
 @ApiTags('User')
 @Controller('users')
-@UseInterceptors(CacheInterceptor)
 export class UserController {
   private svc: UserServiceClient;
 
@@ -55,15 +52,15 @@ export class UserController {
   }
 
   @Get()
-  private async getAll(
-    @Query() query: UsersQueryDto,
-  ): Promise<Observable<UsersDto>> {
+  private async getAll(@Query() query: UsersQueryDto): Promise<UsersDto> {
     var pbQuery = {
       page: query.page || 0,
       size: query.size || 0,
     };
 
-    return this.svc.getAll(pbQuery).pipe(timeout(TIMEOUT));
+    return await firstValueFrom(
+      this.svc.getAll(pbQuery).pipe(timeout(TIMEOUT)),
+    );
   }
 
   @ApiBearerAuth()
@@ -77,7 +74,9 @@ export class UserController {
   }
 
   @Get(':id')
-  private async getById(@Param('id') id: string): Promise<Observable<UserDto>> {
-    return this.svc.getById({ id }).pipe(timeout(TIMEOUT));
+  private async getById(@Param('id') id: string): Promise<UserDto> {
+    return await firstValueFrom(
+      this.svc.getById({ id }).pipe(timeout(TIMEOUT)),
+    );
   }
 }

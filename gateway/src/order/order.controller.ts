@@ -10,10 +10,9 @@ import {
   Req,
   Query,
   Put,
-  UseInterceptors,
 } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
-import { Observable, TimeoutError, throwError, timeout } from 'rxjs';
+import { Observable, firstValueFrom, timeout } from 'rxjs';
 import { OrderServiceClient, ORDER_SERVICE_NAME } from './order.pb';
 import { UserGuard, UserRequest } from '../user/user.guard';
 import {
@@ -26,13 +25,11 @@ import {
 } from './order.dto';
 import { Empty } from './google/protobuf/empty.pb';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { CacheInterceptor } from '@nestjs/cache-manager';
 
 const TIMEOUT = 5000;
 
 @ApiTags('Order')
 @Controller('order')
-@UseInterceptors(CacheInterceptor)
 export class OrderController implements OnModuleInit {
   private svc: OrderServiceClient;
 
@@ -72,9 +69,7 @@ export class OrderController implements OnModuleInit {
   }
 
   @Get()
-  private async getAll(
-    @Query() query: OrdersQueryDto,
-  ): Promise<Observable<OrdersDto>> {
+  private async getAll(@Query() query: OrdersQueryDto): Promise<OrdersDto> {
     var pbQuery = {
       page: query.page || 0,
       size: query.size || 0,
@@ -82,13 +77,15 @@ export class OrderController implements OnModuleInit {
       userId: query.userId || '',
     };
 
-    return this.svc.getAll(pbQuery).pipe(timeout(TIMEOUT));
+    return await firstValueFrom(
+      this.svc.getAll(pbQuery).pipe(timeout(TIMEOUT)),
+    );
   }
 
   @Get(':id')
-  private async getById(
-    @Param('id') id: string,
-  ): Promise<Observable<OrderDto>> {
-    return this.svc.getById({ id }).pipe(timeout(TIMEOUT));
+  private async getById(@Param('id') id: string): Promise<OrderDto> {
+    return await firstValueFrom(
+      this.svc.getById({ id }).pipe(timeout(TIMEOUT)),
+    );
   }
 }
