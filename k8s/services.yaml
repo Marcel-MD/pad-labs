@@ -117,3 +117,38 @@ spec:
     port: 8071
     targetPort: 8071
   type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: etl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: etl
+  template:
+    metadata:
+      labels:
+        app: etl
+    spec:
+      containers:
+      - name: etl
+        image: marcelvlasenco/pad-labs-etl:latest
+        ports:
+        - containerPort: 8060
+        # Add other configuration like dependencies and volumes as needed
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: etl
+spec:
+  selector:
+    app: etl
+  ports:
+  - name: etl-port-8060
+    protocol: TCP
+    port: 8060
+    targetPort: 8060
+  type: ClusterIP
