@@ -21,7 +21,9 @@ More information about [Kubernetes](https://kubernetes.io/).
 To run the application type these commands one by one in this exact order in the k8s folder.
 
 ```bash
-$ kubectl apply -f ./infra.yaml
+$ kubectl apply -f ./rabbitmq.yaml
+$ kubectl apply -f ./redis.yaml
+$ kubectl apply -f ./postgres.yaml
 $ kubectl apply -f ./services.yaml
 $ kubectl apply -f ./gateway.yaml
 ```
@@ -31,7 +33,9 @@ To delete created resources type these commands in the k8s folder.
 ```bash
 $ kubectl delete -f ./gateway.yaml
 $ kubectl delete -f ./services.yaml
-$ kubectl delete -f ./infra.yaml
+$ kubectl delete -f ./postgres.yaml
+$ kubectl delete -f ./redis.yaml
+$ kubectl delete -f ./rabbitmq.yaml
 ```
 
 ## Use the Application
