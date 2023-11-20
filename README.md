@@ -52,15 +52,7 @@ $ kubectl delete -f ./gateway.yaml
 $ kubectl delete -f ./services.yaml
 $ kubectl delete -f ./postgres.yaml
 $ kubectl delete -f ./rabbitmq.yaml
-```
-
-To delete redis cluster resources type these commands.
-
-```bash
-$ kubectl delete service,statefulsets redis-cluster
-$ kubectl delete configmaps redis-cluster-config
-$ kubectl delete poddisruptionbudgets.policy redis-cluster-pd
-$ kubectl delete pod redis-cluster-0 redis-cluster-1 redis-cluster-2 redis-cluster-3 redis-cluster-4 redis-cluster-5
+$ kubectl delete -f ./redis-cluster.yaml
 ```
 
 ## Use the Application
