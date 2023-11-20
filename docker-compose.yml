@@ -65,7 +65,7 @@ services:
       - 8070:8070
       - 8071:8071
 
-  redis-cluster:
+  redis:
     image: redis
     ports:
       - 6379:6379
@@ -75,7 +75,7 @@ services:
       context: ./gateway
       dockerfile: Dockerfile
     depends_on:
-      - redis-cluster
+      - redis
       - user
       - product
       - order
