@@ -21,7 +21,7 @@ import { PrometheusModule } from '@willsoto/nestjs-prometheus';
       isGlobal: true,
       ttl: 1,
       store: redisStore,
-      host: process.env.REDIS_HOST || 'redis',
+      host: process.env.REDIS_HOST || 'redis-cluster',
       port: process.env.REDIS_PORT || 6379,
     }),
     ThrottlerModule.forRoot([

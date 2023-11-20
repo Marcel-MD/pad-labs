@@ -18,20 +18,49 @@ You might have to run this command twice if it doesn't work the first time :)
 ## Run Application with Kubernetes
 
 More information about [Kubernetes](https://kubernetes.io/).  
-To run the application type these commands one by one in this exact order in the k8s folder.
+First of all you need to start redis cluster which will take some time.
 
 ```bash
-$ kubectl apply -f ./infra.yaml
+$ kubectl apply -f ./redis-cluster.yaml
+```
+
+Once all the pods are initialized, you can see that Pod "redis-cluster-0" became the cluster master with the other nodes as slaves.
+
+```bash
+$ kubectl exec redis-cluster-0 -- redis-cli cluster nodes
+```
+
+You can also check the slot configuration.
+
+```bash
+$ kubectl exec redis-cluster-0 -- redis-cli --cluster check localhost 6379
+```
+
+To run everything else type these commands one by one in this exact order.
+
+```bash
+$ kubectl apply -f ./rabbitmq.yaml
+$ kubectl apply -f ./postgres.yaml
 $ kubectl apply -f ./services.yaml
 $ kubectl apply -f ./gateway.yaml
 ```
 
-To delete created resources type these commands in the k8s folder.
+To delete created resources type these commands.
 
 ```bash
 $ kubectl delete -f ./gateway.yaml
 $ kubectl delete -f ./services.yaml
-$ kubectl delete -f ./infra.yaml
+$ kubectl delete -f ./postgres.yaml
+$ kubectl delete -f ./rabbitmq.yaml
+```
+
+To delete redis cluster resources type these commands.
+
+```bash
+$ kubectl delete service,statefulsets redis-cluster
+$ kubectl delete configmaps redis-cluster-config
+$ kubectl delete poddisruptionbudgets.policy redis-cluster-pd
+$ kubectl delete pod redis-cluster-0 redis-cluster-1 redis-cluster-2 redis-cluster-3 redis-cluster-4 redis-cluster-5
 ```
 
 ## Use the Application
