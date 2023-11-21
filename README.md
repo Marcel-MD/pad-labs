@@ -23,19 +23,30 @@ More information about [Kubernetes](https://kubernetes.io/). Before running next
 $ cd ./k8s
 ```
   
-First of all you need to start Redis cluster which will take some time. After that you can use the other two commands to check if the cluster has been initialized correctly.
+First of all you need to start Redis cluster which will take some time.
 
 ```bash
 $ kubectl apply -f ./redis-cluster.yaml
+```
+
+After that you can use these two commands to check if the cluster has been initialized correctly.
+
+```bash
 $ kubectl exec redis-cluster-0 -- redis-cli cluster nodes
 $ kubectl exec redis-cluster-0 -- redis-cli --cluster check localhost 6379
 ```
 
-To start Postgres cluster we'll be using [Kubegres](https://www.kubegres.io/doc/getting-started.html).
+To start Postgres cluster we'll be using [Kubegres](https://www.kubegres.io/doc/getting-started.html).  
+First we have to install Kubegres Custom Resource Definitions.  
 
 ```bash
 $ kubectl apply -f https://raw.githubusercontent.com/reactive-tech/kubegres/v1.17/kubegres.yaml
 $ kubectl get all -n kubegres-system
+```
+
+Then we can start Postgres cluster which may take some time.
+
+```bash
 $ kubectl apply -f postgres-cluster.yaml
 ```
 
@@ -48,17 +59,41 @@ $ kubectl apply -f ./services.yaml
 $ kubectl apply -f ./gateway.yaml
 ```
 
+For performance monitoring we'll be using [Prometheus Operator](https://prometheus-operator.dev/).  
+The first step is to install the operator's Custom Resource Definitions as well as the operator itself with the required RBAC resources.
+
+```bash
+LATEST=$(curl -s https://api.github.com/repos/prometheus-operator/prometheus-operator/releases/latest | jq -cr .tag_name)
+curl -sL https://github.com/prometheus-operator/prometheus-operator/releases/download/${LATEST}/bundle.yaml | kubectl create -f -
+```
+
+To start Prometheus run the following command.
+
+```bash
+$ kubectl apply -f ./prometheus-operator.yaml
+```
+
+## Cleanup Kubernetes Resources
+
 To delete created resources type these commands.
 
 ```bash
+$ kubectl delete -f ./prometheus-operator.yaml
 $ kubectl delete -f ./gateway.yaml
 $ kubectl delete -f ./services.yaml
 $ kubectl delete -f ./postgres.yaml
 $ kubectl delete -f ./rabbitmq.yaml
 $ kubectl delete -f ./redis-cluster.yaml
 $ kubectl delete kubegres warehouse
+```
+
+To also delete Kubegres Custom Resource Definitions.
+
+```bash
 $ kubectl delete -f https://raw.githubusercontent.com/reactive-tech/kubegres/v1.17/kubegres.yaml
 ```
+
+I don't know how to remove Prometheus Operator.
 
 ## Use the Application
 

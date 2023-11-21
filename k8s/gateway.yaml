@@ -13,11 +13,11 @@ spec:
         app: gateway
     spec:
       containers:
-      - name: gateway
-        image: marcelvlasenco/pad-labs-gateway:latest
-        ports:
-        - containerPort: 3010
-        # Add other configuration like dependencies and volumes as needed
+        - name: gateway
+          image: marcelvlasenco/pad-labs-gateway:latest
+          ports:
+            - containerPort: 3010
+          # Add other configuration like dependencies and volumes as needed
 ---
 apiVersion: v1
 kind: Service
@@ -27,8 +27,8 @@ spec:
   selector:
     app: gateway
   ports:
-  - protocol: TCP
-    port: 3010
-    targetPort: 3010
+    - protocol: TCP
+      port: 3010
+      targetPort: 3010
   type: LoadBalancer
   # You may need to adjust this further depending on your Kubernetes environment

@@ -13,29 +13,31 @@ spec:
         app: user
     spec:
       containers:
-      - name: user
-        image: marcelvlasenco/pad-labs-user:latest
-        ports:
-        - containerPort: 8080
-        - containerPort: 8081
-        # Add other configuration like dependencies and volumes as needed
+        - name: user
+          image: marcelvlasenco/pad-labs-user:latest
+          ports:
+            - containerPort: 8080
+            - containerPort: 8081
+          # Add other configuration like dependencies and volumes as needed
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: user
+  labels:
+    app: user
 spec:
   selector:
     app: user
   ports:
-  - name: user-port-8080
-    protocol: TCP
-    port: 8080
-    targetPort: 8080
-  - name: user-port-8081
-    protocol: TCP
-    port: 8081
-    targetPort: 8081
+    - name: user-port-8080
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+    - name: user-port-8081
+      protocol: TCP
+      port: 8081
+      targetPort: 8081
   type: ClusterIP
 ---
 apiVersion: apps/v1
@@ -53,29 +55,31 @@ spec:
         app: product
     spec:
       containers:
-      - name: product
-        image: marcelvlasenco/pad-labs-product:latest
-        ports:
-        - containerPort: 8090
-        - containerPort: 8091
-        # Add other configuration like dependencies and volumes as needed
+        - name: product
+          image: marcelvlasenco/pad-labs-product:latest
+          ports:
+            - containerPort: 8090
+            - containerPort: 8091
+          # Add other configuration like dependencies and volumes as needed
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: product
+  labels:
+    app: product
 spec:
   selector:
     app: product
   ports:
-  - name: product-port-8090
-    protocol: TCP
-    port: 8090
-    targetPort: 8090
-  - name: product-port-8091
-    protocol: TCP
-    port: 8091
-    targetPort: 8091
+    - name: product-port-8090
+      protocol: TCP
+      port: 8090
+      targetPort: 8090
+    - name: product-port-8091
+      protocol: TCP
+      port: 8091
+      targetPort: 8091
   type: ClusterIP
 ---
 apiVersion: apps/v1
@@ -93,29 +97,31 @@ spec:
         app: order
     spec:
       containers:
-      - name: order
-        image: marcelvlasenco/pad-labs-order:latest
-        ports:
-        - containerPort: 8070
-        - containerPort: 8071
-        # Add other configuration like dependencies and volumes as needed
+        - name: order
+          image: marcelvlasenco/pad-labs-order:latest
+          ports:
+            - containerPort: 8070
+            - containerPort: 8071
+          # Add other configuration like dependencies and volumes as needed
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: order
+  labels:
+    app: order
 spec:
   selector:
     app: order
   ports:
-  - name: order-port-8070
-    protocol: TCP
-    port: 8070
-    targetPort: 8070
-  - name: order-port-8071
-    protocol: TCP
-    port: 8071
-    targetPort: 8071
+    - name: order-port-8070
+      protocol: TCP
+      port: 8070
+      targetPort: 8070
+    - name: order-port-8071
+      protocol: TCP
+      port: 8071
+      targetPort: 8071
   type: ClusterIP
 ---
 apiVersion: apps/v1
@@ -133,11 +139,11 @@ spec:
         app: etl
     spec:
       containers:
-      - name: etl
-        image: marcelvlasenco/pad-labs-etl:latest
-        ports:
-        - containerPort: 8060
-        # Add other configuration like dependencies and volumes as needed
+        - name: etl
+          image: marcelvlasenco/pad-labs-etl:latest
+          ports:
+            - containerPort: 8060
+          # Add other configuration like dependencies and volumes as needed
 ---
 apiVersion: v1
 kind: Service
@@ -147,8 +153,8 @@ spec:
   selector:
     app: etl
   ports:
-  - name: etl-port-8060
-    protocol: TCP
-    port: 8060
-    targetPort: 8060
+    - name: etl-port-8060
+      protocol: TCP
+      port: 8060
+      targetPort: 8060
   type: ClusterIP
