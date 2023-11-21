@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: warehouse-secret
+  namespace: default
+type: Opaque
+stringData:
+  superUserPassword: password
+  replicationUserPassword: password
+---
+apiVersion: kubegres.reactive-tech.io/v1
+kind: Kubegres
+metadata:
+  name: warehouse
+  namespace: default
+spec:
+  replicas: 3
+  image: postgres:latest
+  database:
+    size: 200Mi
+  env:
+    - name: POSTGRES_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: warehouse-secret
+          key: superUserPassword
+    - name: POSTGRES_REPLICATION_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: warehouse-secret
+          key: replicationUserPassword
+    - name: POSTGRES_DB
+      value: warehouse

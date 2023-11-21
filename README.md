@@ -17,23 +17,26 @@ You might have to run this command twice if it doesn't work the first time :)
 
 ## Run Application with Kubernetes
 
-More information about [Kubernetes](https://kubernetes.io/).  
-First of all you need to start redis cluster which will take some time.
+More information about [Kubernetes](https://kubernetes.io/). Before running next commands move to `k8s` directory.
+
+```bash
+$ cd ./k8s
+```
+  
+First of all you need to start Redis cluster which will take some time. After that you can use the other two commands to check if the cluster has been initialized correctly.
 
 ```bash
 $ kubectl apply -f ./redis-cluster.yaml
-```
-
-Once all the pods are initialized, you can see that Pod "redis-cluster-0" became the cluster master with the other nodes as slaves.
-
-```bash
 $ kubectl exec redis-cluster-0 -- redis-cli cluster nodes
+$ kubectl exec redis-cluster-0 -- redis-cli --cluster check localhost 6379
 ```
 
-You can also check the slot configuration.
+To start Postgres cluster we'll be using [Kubegres](https://www.kubegres.io/doc/getting-started.html).
 
 ```bash
-$ kubectl exec redis-cluster-0 -- redis-cli --cluster check localhost 6379
+$ kubectl apply -f https://raw.githubusercontent.com/reactive-tech/kubegres/v1.17/kubegres.yaml
+$ kubectl get all -n kubegres-system
+$ kubectl apply -f postgres-cluster.yaml
 ```
 
 To run everything else type these commands one by one in this exact order.
@@ -53,6 +56,8 @@ $ kubectl delete -f ./services.yaml
 $ kubectl delete -f ./postgres.yaml
 $ kubectl delete -f ./rabbitmq.yaml
 $ kubectl delete -f ./redis-cluster.yaml
+$ kubectl delete kubegres warehouse
+$ kubectl delete -f https://raw.githubusercontent.com/reactive-tech/kubegres/v1.17/kubegres.yaml
 ```
 
 ## Use the Application
