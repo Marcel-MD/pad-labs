@@ -122,8 +122,8 @@ You can find the internal endpoints specification in `/proto` folder.
 
 ## Redis Cluster Diagram
 
-![Diagram](https://github.com/Marcel-MD/pad-labs/blob/main/redis-cluster.png)
+<img src="https://github.com/Marcel-MD/pad-labs/blob/main/redis-cluster.png" alt="Redis Cluster Diagram" width="600"/>
 
 ## Postgres Cluster Diagram
 
-![Diagram](https://github.com/Marcel-MD/pad-labs/blob/main/postgres-cluster.png)
+<img src="https://github.com/Marcel-MD/pad-labs/blob/main/postgres-cluster.png" alt="Postgres Cluster Diagram" width="400"/>
