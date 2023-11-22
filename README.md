@@ -22,7 +22,7 @@ More information about [Kubernetes](https://kubernetes.io/). Before running next
 ```bash
 $ cd ./k8s
 ```
-  
+
 First of all you need to start Redis cluster which will take some time.
 
 ```bash
@@ -37,7 +37,7 @@ $ kubectl exec redis-cluster-0 -- redis-cli --cluster check localhost 6379
 ```
 
 To start Postgres cluster we'll be using [Kubegres](https://www.kubegres.io/doc/getting-started.html).  
-First we have to install Kubegres Custom Resource Definitions.  
+First we have to install Kubegres Custom Resource Definitions.
 
 ```bash
 $ kubectl apply -f https://raw.githubusercontent.com/reactive-tech/kubegres/v1.17/kubegres.yaml
@@ -119,3 +119,11 @@ You can find the internal endpoints specification in `/proto` folder.
 ## System Architecture Diagram
 
 ![Diagram](https://github.com/Marcel-MD/pad-labs/blob/main/diagram.png)
+
+## Redis Cluster Diagram
+
+![Diagram](https://github.com/Marcel-MD/pad-labs/blob/main/redis-cluster.png)
+
+## Postgres Cluster Diagram
+
+![Diagram](https://github.com/Marcel-MD/pad-labs/blob/main/postgres-cluster.png)

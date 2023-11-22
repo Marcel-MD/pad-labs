@@ -4,7 +4,7 @@
 [Prometheus] as PR
 
 [API Gateway (NestJS)] as AG
-database "Redis Cache" as RDB
+database "Redis Cluster" as RDB
 node RabbitMQ as MQ
 
 [User Service (Go)] as US
@@ -14,7 +14,7 @@ database "Product DB" as PDB
 [Order Service (Go)] as OS
 database "Order DB" as ODB
 [ETL] as ETL
-database "Data Warehouse" as DW
+database "Warehouse" as DW
 
 AG -right- RDB
 AG --> US : gRPC
@@ -25,8 +25,6 @@ US -down- UDB
 PS -down- PDB
 OS -down- ODB
 
-OS <.right.> PS : 2 Phase Commit
-US -right[hidden]- OS
 US <--> MQ : AMQP
 PS <--> MQ : AMQP
 OS <--> MQ : AMQP
