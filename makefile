@@ -32,3 +32,6 @@ push:
 	docker image push marcelvlasenco/pad-labs-order:latest
 	docker image push marcelvlasenco/pad-labs-user:latest
 	docker image push marcelvlasenco/pad-labs-etl:latest
+
+k6:
+	k6 run load-test.js
